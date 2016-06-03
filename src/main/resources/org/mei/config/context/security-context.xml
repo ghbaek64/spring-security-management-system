@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+		xmlns="http://www.springframework.org/schema/security"
+		xmlns:beans="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+	">
+
+	<http pattern="/resources/**" security="none"/>
+
+	<beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+	<authentication-manager id="authenticationManager">
+		<authentication-provider>
+			<user-service>
+				<user name="user" password="1234" authorities="ROLE_USER"/>
+				<user name="admin" password="1234" authorities="ROLE_USER, ROLE_ADMIN"/>
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+
+	<beans:bean id="unauthorizedEntryPoint" class="org.mei.core.security.handler.UnauthorizedEntryPoint">
+		<beans:constructor-arg name="loginUrl" value="/member/login" />
+	</beans:bean>
+
+	<beans:bean id="signInSuccessHandler" class="org.mei.core.security.handler.SignInSuccessHandler">
+		<beans:property name="targetUrlParameter" value="redirect_url" />
+		<beans:property name="alwaysUseDefaultTargetUrl" value="false" />
+		<beans:property name="defaultTargetUrl" value="/" />
+	</beans:bean>
+
+	<beans:bean id="signOutSuccessHandler" class="org.mei.core.security.handler.SignOutSuccessHandler">
+		<beans:property name="targetUrlParameter" value="redirect_url" />
+		<beans:property name="alwaysUseDefaultTargetUrl" value="false" />
+		<beans:property name="defaultTargetUrl" value="/" />
+		<beans:property name="useReferer" value="false" />
+	</beans:bean>
+
+	<beans:bean id="signInFailureHandler" class="org.mei.core.security.handler.SignInFailureHandler">
+		<beans:property name="defaultFailureUrl" value="/" />
+	</beans:bean>
+
+	<beans:bean id="accessFailureHandler" class="org.mei.core.security.handler.AccessFailureHandler">
+		<beans:constructor-arg name="loginUrl" value="/member/login" />
+		<beans:constructor-arg name="errorPage" value="/pages/error/401.jsp" />
+		<beans:property name="redirectUrlParameter" value="redirect_url" />
+	</beans:bean>
+
+	<!-- SESSION MANAGEMENT -->
+	<beans:bean id="sas" class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+		<beans:constructor-arg>
+			<beans:list>
+
+				<beans:bean class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+					<beans:constructor-arg ref="sessionRegistry"/>
+					<beans:property name="maximumSessions" value="1" />
+					<beans:property name="exceptionIfMaximumExceeded" value="false" />
+				</beans:bean>
+
+				<beans:bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+				</beans:bean>
+
+				<beans:bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+					<beans:constructor-arg ref="sessionRegistry"/>
+				</beans:bean>
+
+			</beans:list>
+		</beans:constructor-arg>
+	</beans:bean>
+	<!-- SESSION MANAGEMENT -->
+
+	<!-- Custom Filter Setting -->
+	<beans:bean id="concurrentSessionFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
+		<beans:constructor-arg name="expiredUrl" value="/" />
+		<beans:constructor-arg name="sessionRegistry" value="sessionRegistry" />
+	</beans:bean>
+
+	<beans:bean id="usernamePasswordAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+		<beans:property name="sessionAuthenticationStrategy" ref="sas" />
+	</beans:bean>
+	<!-- Custom Filter Setting -->
+
+	<http auto-config="true" use-expressions="true" create-session="ifRequired" entry-point-ref="unauthorizedEntryPoint">
+
+		<session-management session-authentication-strategy-ref="sas"/>
+		<access-denied-handler ref="accessFailureHandler" />
+
+		<form-login
+				login-page="/member/login"
+				username-parameter="user_id"
+				password-parameter="password"
+				login-processing-url="/member/login"
+				authentication-success-handler-ref="signInSuccessHandler"
+				authentication-failure-handler-ref="signInFailureHandler"
+				/>
+
+		<logout
+				invalidate-session="true"
+				logout-url="/member/logout"
+				success-handler-ref="signOutSuccessHandler"
+				delete-cookies="JSESSIONID"
+				/>
+
+		<custom-filter ref="concurrentSessionFilter" />
+		<custom-filter ref="usernamePasswordAuthenticationFilter" />
+
+		<csrf disabled="true"/>
+
+	</http>
+
+	<global-method-security pre-post-annotations="enabled">
+		<expression-handler ref="expressionHandler"/>
+	</global-method-security>
+
+	<beans:bean id="expressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler" />
+
+</beans:beans>
