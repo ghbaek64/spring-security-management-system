@@ -78,7 +78,6 @@ public class SecurityContext {
 			String targetUrlParameter = "redirect_url";
 			boolean alwaysUseDefaultTargetUrl = false;
 			String defaultTargetUrl = "/";
-			boolean useReferer = false;
 			String expiredUrl = "/";
 
 			// 오류가 발생했을 때
@@ -103,7 +102,6 @@ public class SecurityContext {
 			signOutSuccessHandler.setAlwaysUseDefaultTargetUrl(alwaysUseDefaultTargetUrl);
 			signOutSuccessHandler.setDefaultTargetUrl(defaultTargetUrl);
 			signOutSuccessHandler.setTargetUrlParameter(targetUrlParameter);
-			signOutSuccessHandler.setUseReferer(useReferer);
 
 			SignInFailureHandler signInFailureHandler = new SignInFailureHandler();
 			signInFailureHandler.setDefaultFailureUrl(defaultTargetUrl);

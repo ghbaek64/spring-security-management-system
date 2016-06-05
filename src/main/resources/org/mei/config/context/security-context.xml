@@ -35,7 +35,6 @@
 		<beans:property name="targetUrlParameter" value="redirect_url" />
 		<beans:property name="alwaysUseDefaultTargetUrl" value="false" />
 		<beans:property name="defaultTargetUrl" value="/" />
-		<beans:property name="useReferer" value="false" />
 	</beans:bean>
 
 	<beans:bean id="signInFailureHandler" class="org.mei.core.security.handler.SignInFailureHandler">
