@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1. 암호화
- * 2. 중복 로그인인 경우 경고 메세지 출력 후 로그인 여부 선택하기
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 5. 30.
@@ -83,13 +81,6 @@ public class SecurityContext {
 			// 오류가 발생했을 때
 			String errorPageUrl = "/pages/error/401.jsp";
 			String redirectUrlParameter = "redirect_url";
-
-			/**
-			 * @see SessionCreationPolicy.IF_REQUIRED : 시큐리티에서 필요한 경우 한번 생성함.
-			 * @see SessionCreationPolicy.ALWAYS : 무조건 만듬
-			 * @see SessionCreationPolicy.NEVER : 응용프로그램에서 필요할 경우 생성함.
-			 * @see SessionCreationPolicy.STATELESS : 만들지 않음
-			 */
 
 			UnauthorizedEntryPoint unauthorizedEntryPoint = new UnauthorizedEntryPoint(loginUrl);
 
