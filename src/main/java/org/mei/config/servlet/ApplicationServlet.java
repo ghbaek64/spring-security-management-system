@@ -28,13 +28,13 @@ import java.util.Properties;
 )
 public class ApplicationServlet extends WebMvcConfigurerAdapter {
 
-	@Autowired private Properties config;
+	@Autowired private Properties mei;
 
 	@Bean
 	public InternalResourceViewResolver getInternalResourceViewResolver() {
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
 		resolver.setPrefix("/WEB-INF/views/");
-		resolver.setContentType("text/html;charset=" + config.getProperty("app.charset"));
+		resolver.setContentType("text/html;charset=" + mei.getProperty("app.charset"));
 		resolver.setSuffix(".jsp");
 		resolver.setCache(false);
 		resolver.setCacheLimit(0);
