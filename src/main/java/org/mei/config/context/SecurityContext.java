@@ -1,10 +1,13 @@
 package org.mei.config.context;
 
 import org.mei.core.security.handler.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -21,6 +24,7 @@ import org.springframework.security.web.session.ConcurrentSessionFilter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -46,7 +50,9 @@ public class SecurityContext {
 
 	@Configuration
 	public static class SecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+		private static final Logger logger = LoggerFactory.getLogger(SecurityConfigurationAdapter.class);
 
+		@Autowired Properties mei;
 		@Autowired SessionRegistry sessionRegistry;
 
 		private AuthenticationManager authenticationManager;
@@ -65,22 +71,35 @@ public class SecurityContext {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			String loginUrl = "/member/login";
+			String loginUrl = mei.getProperty("security.loginUrl");
 
-			String usernameParameter = "user_id";
-			String passwordParameter = "password";
+			String usernameParameter = mei.getProperty("security.usernameParameter");
+			String passwordParameter = mei.getProperty("security.passwordParameter");
 
-			String logoutUrl = "/member/logout";
-			String cookieName = "JSESSIONID";
+			String logoutUrl = mei.getProperty("security.logoutUrl");
+			String cookieName = mei.getProperty("security.cookieName");
 
-			String targetUrlParameter = "redirect_url";
-			boolean alwaysUseDefaultTargetUrl = false;
-			String defaultTargetUrl = "/";
-			String expiredUrl = "/";
+			String targetUrlParameter = mei.getProperty("security.targetUrlParameter");
+			boolean alwaysUseDefaultTargetUrl = Boolean.parseBoolean( mei.getProperty("security.alwaysUseDefaultTargetUrl") );
+			String defaultTargetUrl = mei.getProperty("security.defaultTargetUrl");
+			String expiredUrl = mei.getProperty("security.expiredUrl");
 
 			// 오류가 발생했을 때
-			String errorPageUrl = "/pages/error/401.jsp";
-			String redirectUrlParameter = "redirect_url";
+			String errorPageUrl = mei.getProperty("security.errorPageUrl");
+			String redirectUrlParameter = mei.getProperty("security.redirectUrlParameter");
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("loginUrl: " + loginUrl);
+				logger.debug("usernameParameter: " + usernameParameter);
+				logger.debug("passwordParameter: " + passwordParameter);
+				logger.debug("logoutUrl: " + logoutUrl);
+				logger.debug("targetUrlParameter: " + targetUrlParameter);
+				logger.debug("alwaysUseDefaultTargetUrl: " + alwaysUseDefaultTargetUrl);
+				logger.debug("defaultTargetUrl: " + defaultTargetUrl);
+				logger.debug("expiredUrl: " + expiredUrl);
+				logger.debug("errorPageUrl: " + errorPageUrl);
+				logger.debug("redirectUrlParameter: " + redirectUrlParameter);
+			}
 
 			UnauthorizedEntryPoint unauthorizedEntryPoint = new UnauthorizedEntryPoint(loginUrl);
 
