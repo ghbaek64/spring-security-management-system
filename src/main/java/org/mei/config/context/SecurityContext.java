@@ -1,10 +1,10 @@
 package org.mei.config.context;
 
-import org.mei.app.modules.member.service.JsonConsumerService;
 import org.mei.core.security.ConsumerAuthenticationProvider;
 import org.mei.core.security.handler.*;
 import org.mei.core.security.password.ShaPasswordEncoder;
 import org.mei.core.security.service.ConsumerDetailsService;
+import org.mei.core.security.service.ConsumerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +30,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.session.*;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -46,6 +47,8 @@ public class SecurityContext {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityContext.class);
 
 	@Autowired Properties mei;
+
+	@Resource(name="memberService") private ConsumerService consumerService;
 
 	private PasswordEncoder passwordEncoder;
 
@@ -88,7 +91,8 @@ public class SecurityContext {
 				.and().withUser("admin").password("1234").roles("ADMIN", "USER");
 		 */
 		passwordEncoder = getPasswordEncoder();
-		UserDetailsService userDetailsService = new ConsumerDetailsService(new JsonConsumerService());
+		//UserDetailsService userDetailsService = new ConsumerDetailsService(new JsonConsumerService());
+		UserDetailsService userDetailsService = new ConsumerDetailsService(consumerService);
 		ConsumerAuthenticationProvider consumerAuthenticationProvider = new ConsumerAuthenticationProvider(userDetailsService);
 		consumerAuthenticationProvider.setPasswordEncoder(passwordEncoder);
 

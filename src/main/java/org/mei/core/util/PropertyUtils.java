@@ -1,4 +1,4 @@
-package org.mei.core.io.support;
+package org.mei.core.util;
 
 import java.util.*;
 
