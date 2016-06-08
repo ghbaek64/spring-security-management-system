@@ -12,6 +12,21 @@
 
 	<beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
+	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	<beans:bean id="jsonConsumerService" class="org.mei.app.modules.member.service.JsonConsumerService" />
+	<beans:bean id="userDetailsService" class="org.mei.core.security.service.ConsumerDetailsService">
+		<beans:constructor-arg name="consumerService" ref="jsonConsumerService" />
+	</beans:bean>
+	<beans:bean id="authenticationProvider" class="org.mei.core.security.ConsumerAuthenticationProvider">
+		<beans:constructor-arg name="userDetailsService" ref="userDetailsService" />
+		<beans:property name="passwordEncoder" ref="passwordEncoder" />
+	</beans:bean>
+
+	<authentication-manager id="authenticationManager">
+		<authentication-provider ref="authenticationProvider" />
+	</authentication-manager>
+
+	<!--
 	<authentication-manager id="authenticationManager">
 		<authentication-provider>
 			<user-service>
@@ -20,6 +35,7 @@
 			</user-service>
 		</authentication-provider>
 	</authentication-manager>
+	-->
 
 	<beans:bean id="unauthorizedEntryPoint" class="org.mei.core.security.handler.UnauthorizedEntryPoint">
 		<beans:constructor-arg name="loginUrl" value="/member/login" />
