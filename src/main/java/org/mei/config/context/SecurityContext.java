@@ -1,6 +1,10 @@
 package org.mei.config.context;
 
+import org.mei.app.modules.member.service.JsonConsumerService;
+import org.mei.core.security.ConsumerAuthenticationProvider;
 import org.mei.core.security.handler.*;
+import org.mei.core.security.password.ShaPasswordEncoder;
+import org.mei.core.security.service.ConsumerDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.*;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
@@ -36,16 +45,54 @@ import java.util.Properties;
 public class SecurityContext {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityContext.class);
 
+	@Autowired Properties mei;
+
+	private PasswordEncoder passwordEncoder;
+
 	@Bean
 	public SessionRegistry sessionRegistry() {
 		return new SessionRegistryImpl();
 	}
 
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return passwordEncoder;
+	}
+
+	/**
+	 * 암호화를 생성한다.
+	 *
+	 * @return
+	 */
+	private PasswordEncoder getPasswordEncoder() {
+		String passwordEncoderType = mei.getProperty("security.passwordEncoder");
+		String salt = mei.getProperty("security.sha.salt", null);
+
+		if (passwordEncoderType.equals("noOpPasswordEncoder")) {
+			return NoOpPasswordEncoder.getInstance();
+		} else if (passwordEncoderType.equals("standardPasswordEncoder")) {
+			return new StandardPasswordEncoder(salt);
+		} else if (passwordEncoderType.equals("shaPasswordEncoder")) {
+			int strength = Integer.parseInt(mei.getProperty("security.sha.strength", "256"));
+			return new ShaPasswordEncoder(strength);
+		} else {
+			return new BCryptPasswordEncoder();
+		}
+	}
+
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		/*
 		auth.inMemoryAuthentication()
 				.withUser("user").password("1234").roles("USER")
 				.and().withUser("admin").password("1234").roles("ADMIN", "USER");
+		 */
+		passwordEncoder = getPasswordEncoder();
+		UserDetailsService userDetailsService = new ConsumerDetailsService(new JsonConsumerService());
+		ConsumerAuthenticationProvider consumerAuthenticationProvider = new ConsumerAuthenticationProvider(userDetailsService);
+		consumerAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+
+		auth.authenticationProvider(consumerAuthenticationProvider);
 	}
 
 	@Configuration
@@ -54,6 +101,7 @@ public class SecurityContext {
 
 		@Autowired Properties mei;
 		@Autowired SessionRegistry sessionRegistry;
+		@Autowired PasswordEncoder passwordEncoder;
 
 		private AuthenticationManager authenticationManager;
 
