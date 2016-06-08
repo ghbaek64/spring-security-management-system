@@ -3,12 +3,9 @@ package org.mei.core.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mei.core.common.http.Requesting;
 import org.mei.core.module.handler.SuccessHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +22,6 @@ import java.util.Map;
  * @since 16. 5. 30.
  */
 public class SignInFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-	//@Autowired private MessageSourceAccessor messageSourceAccessor;
-
 	public SignInFailureHandler() {
 	}
 
@@ -40,7 +35,6 @@ public class SignInFailureHandler extends SimpleUrlAuthenticationFailureHandler 
 
 		if (exception.getClass().isAssignableFrom(CredentialsExpiredException.class)) {
 			data.put("passwordExpired", true);
-			System.out.println("aaaa");
 		}
 
 		if(Requesting.isAjax(request)) {

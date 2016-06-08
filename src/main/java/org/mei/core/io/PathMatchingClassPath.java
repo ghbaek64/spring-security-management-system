@@ -26,11 +26,11 @@ public class PathMatchingClassPath {
 	private PathMatchingClassPath() {
 	}
 
-	public String[] getClassPath(String locationPattern) throws IOException {
+	public static String[] getClassPath(String locationPattern) throws IOException {
 		return getClassPath(new String[]{locationPattern});
 	}
 
-	public String[] getClassPath(String[] locationPattern) throws IOException {
+	public static String[] getClassPath(String[] locationPattern) throws IOException {
 		PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 		List<String> strings = new ArrayList();
@@ -65,7 +65,7 @@ public class PathMatchingClassPath {
 		return strings.toArray(new String[strings.size()]);
 	}
 
-	private String processBasename(String baseName) {
+	private static String processBasename(String baseName) {
 		String prefix = substringBeforeLast(baseName, "/");
 		String name = substringAfterLast(baseName, "/");
 		do {

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -35,6 +34,7 @@ import java.util.Properties;
 @Order(2)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled=true)
 public class SecurityContext {
+	private static final Logger logger = LoggerFactory.getLogger(SecurityContext.class);
 
 	@Bean
 	public SessionRegistry sessionRegistry() {
@@ -88,6 +88,9 @@ public class SecurityContext {
 			String errorPageUrl = mei.getProperty("security.errorPageUrl");
 			String redirectUrlParameter = mei.getProperty("security.redirectUrlParameter");
 
+			int maximumSessions = Integer.parseInt(mei.getProperty("security.maximumSessions"), -1);
+			boolean exceptionIfMaximumExceeded = Boolean.parseBoolean(mei.getProperty("security.exceptionIfMaximumExceeded"));
+
 			if (logger.isDebugEnabled()) {
 				logger.debug("loginUrl: " + loginUrl);
 				logger.debug("usernameParameter: " + usernameParameter);
@@ -99,6 +102,9 @@ public class SecurityContext {
 				logger.debug("expiredUrl: " + expiredUrl);
 				logger.debug("errorPageUrl: " + errorPageUrl);
 				logger.debug("redirectUrlParameter: " + redirectUrlParameter);
+
+				logger.debug("maximumSessions: " + maximumSessions);
+				logger.debug("exceptionIfMaximumExceeded: " + exceptionIfMaximumExceeded);
 			}
 
 			UnauthorizedEntryPoint unauthorizedEntryPoint = new UnauthorizedEntryPoint(loginUrl);
@@ -126,8 +132,8 @@ public class SecurityContext {
 
 			// @see ConcurrentSessionControlAuthenticationHandler
 			ConcurrentSessionControlAuthenticationStrategy controlAuthenticationStrategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry);
-			controlAuthenticationStrategy.setMaximumSessions(1);
-			controlAuthenticationStrategy.setExceptionIfMaximumExceeded(false);
+			controlAuthenticationStrategy.setMaximumSessions(maximumSessions);
+			controlAuthenticationStrategy.setExceptionIfMaximumExceeded(exceptionIfMaximumExceeded);
 
 			List<SessionAuthenticationStrategy> delegateStrategies = new ArrayList<>();
 			delegateStrategies.add(controlAuthenticationStrategy);
