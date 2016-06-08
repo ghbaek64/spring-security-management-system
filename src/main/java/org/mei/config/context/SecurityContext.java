@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -41,7 +40,6 @@ import java.util.Properties;
  * @since 16. 5. 30.
 */
 @EnableWebSecurity
-@Order(2)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled=true)
 public class SecurityContext {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityContext.class);

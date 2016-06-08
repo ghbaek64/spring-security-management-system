@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -19,7 +18,6 @@ import java.util.Properties;
  * @since 16. 6. 7.
  */
 @Configuration
-@Order(0)
 @PropertySource("classpath:/org/mei/config/mei.properties")
 public class PropertiesContext {
 
