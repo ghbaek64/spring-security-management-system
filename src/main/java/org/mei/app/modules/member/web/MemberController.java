@@ -39,7 +39,7 @@ public class MemberController {
 		return mav;
 	}
 
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')")
 	@RequestMapping(value = "/mypage", method = RequestMethod.GET)
 	public ModelAndView dispMemberMypage(Authentication authentication) {
 		System.out.println(authentication.toString());
