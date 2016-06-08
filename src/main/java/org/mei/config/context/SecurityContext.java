@@ -88,7 +88,7 @@ public class SecurityContext {
 			String errorPageUrl = mei.getProperty("security.errorPageUrl");
 			String redirectUrlParameter = mei.getProperty("security.redirectUrlParameter");
 
-			int maximumSessions = Integer.parseInt(mei.getProperty("security.maximumSessions"), -1);
+			int maximumSessions = Integer.parseInt(mei.getProperty("security.maximumSessions", "-1"));
 			boolean exceptionIfMaximumExceeded = Boolean.parseBoolean(mei.getProperty("security.exceptionIfMaximumExceeded"));
 
 			if (logger.isDebugEnabled()) {
