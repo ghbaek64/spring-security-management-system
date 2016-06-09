@@ -20,11 +20,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.session.*;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 
@@ -48,6 +51,7 @@ public class SecurityContext {
 	@Resource(name= "memberService") private ConsumerService consumerService;
 
 	private PasswordEncoder passwordEncoder;
+	private UserDetailsService userDetailsService;
 
 	@Bean
 	public SessionRegistry sessionRegistry() {
@@ -57,6 +61,11 @@ public class SecurityContext {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return passwordEncoder;
+	}
+
+	@Bean
+	public UserDetailsService userDetailsService() {
+		return userDetailsService;
 	}
 
 	/**
@@ -90,6 +99,9 @@ public class SecurityContext {
 		passwordEncoder = getPasswordEncoder();
 		//UserDetailsService userDetailsService = new ConsumerDetailsService(new JsonConsumerService());
 		ConsumerDetailsService consumerDetailsService = new ConsumerDetailsService(consumerService);
+
+		this.userDetailsService = consumerDetailsService;
+
 		ConsumerAuthenticationProvider consumerAuthenticationProvider = new ConsumerAuthenticationProvider(consumerDetailsService);
 		consumerAuthenticationProvider.setPasswordEncoder(passwordEncoder);
 
@@ -103,6 +115,7 @@ public class SecurityContext {
 		@Autowired Properties mei;
 		@Autowired SessionRegistry sessionRegistry;
 		@Autowired PasswordEncoder passwordEncoder;
+		@Autowired UserDetailsService userDetailsService;
 
 		private AuthenticationManager authenticationManager;
 
@@ -199,6 +212,15 @@ public class SecurityContext {
 			ConcurrentSessionFilter concurrentSessionFilter = new ConcurrentSessionFilter(sessionRegistry, expiredUrl);
 			// Custom Filter Setting
 
+			// Remember ME Service
+			String rememberMeKey = "_MEI_";
+			TokenBasedRememberMeServices rememberMeServices = new TokenBasedRememberMeServices(rememberMeKey, userDetailsService);
+			rememberMeServices.setCookieName("mei_remember_me");
+			rememberMeServices.setParameter("remember_me");
+			rememberMeServices.setTokenValiditySeconds(60 * 60 * 24 * 31); // 1 month
+			// Remember ME Service
+
+
 			http
 					.sessionManagement()
 					.sessionAuthenticationStrategy(sas)
@@ -222,6 +244,11 @@ public class SecurityContext {
 					.logoutUrl(logoutUrl)
 					.logoutSuccessHandler(signOutSuccessHandler)
 					.deleteCookies(cookieName)
+
+					.and()
+					.rememberMe()
+					.key(rememberMeKey)
+					.rememberMeServices(rememberMeServices)
 
 					.and()
 					.addFilter(concurrentSessionFilter)

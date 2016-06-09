@@ -68,6 +68,11 @@
           <h2 class="form-signin-heading"><i class="fa fa-sign-in"></i> 로그인</h2>
           <input type="text" class="form-control" placeholder="아이디" id="user_id" name="user_id" required>
           <input type="password" class="form-control" placeholder="비밀번호" id="password" name="password" required>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="remember_me"> Remember me
+            </label>
+          </div>
           <button class="btn btn-lg btn-primary btn-block" type="submit">로그인</button>
         </form>
       </div>
