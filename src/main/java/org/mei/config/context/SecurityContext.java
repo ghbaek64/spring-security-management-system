@@ -1,6 +1,7 @@
 package org.mei.config.context;
 
 import org.mei.core.security.ConsumerAuthenticationProvider;
+import org.mei.core.security.filter.SecurityMetadataSource;
 import org.mei.core.security.handler.*;
 import org.mei.core.security.password.ShaPasswordEncoder;
 import org.mei.core.security.service.ConsumerDetailsService;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
@@ -220,6 +222,10 @@ public class SecurityContext {
 			rememberMeServices.setTokenValiditySeconds(60 * 60 * 24 * 31); // 1 month
 			// Remember ME Service
 
+			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+			filterSecurityInterceptor.setAuthenticationManager(authenticationManager);
+			filterSecurityInterceptor.setSecurityMetadataSource(new SecurityMetadataSource());
+
 
 			http
 					.sessionManagement()
@@ -253,6 +259,7 @@ public class SecurityContext {
 					.and()
 					.addFilter(concurrentSessionFilter)
 					.addFilter(usernamePasswordAuthenticationFilter)
+					.addFilter(filterSecurityInterceptor)
 					.csrf().disable()
 					.authorizeRequests(); // 없으면 오류 발생 (알수없음)
 		}
