@@ -26,6 +26,10 @@ public class ConsumerDetailsService implements UserDetailsService {
 		this.consumerService = consumerService;
 	}
 
+	public ConsumerService getConsumerService() {
+		return consumerService;
+	}
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		try {

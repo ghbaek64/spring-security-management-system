@@ -30,8 +30,18 @@
 
 	<div class="panel panel-default">
 		<div class="panel-body">
+			<div class="page-header">
+				<h1>Session Info</h1>
+			</div>
 			<div><i class="fa fa-user" aria-hidden="true"></i> User Name: ${principal.username}</div>
 			<div><i class="fa fa-key" aria-hidden="true"></i> Session ID: ${details.sessionId}</div>
+			<div class="page-header">
+				<h1>Member Info</h1>
+			</div>
+			<div><i class="fa fa-user" aria-hidden="true"></i> User Name: ${member.userId}</div>
+			<div><i class="fa fa-key" aria-hidden="true"></i> Session ID: ${member.sessionId}</div>
+			<div><i class="fa fa-key" aria-hidden="true"></i> Last Access Date: ${member.lastAccessDate}</div>
+			<div><i class="fa fa-key" aria-hidden="true"></i> IP Address: ${member.lastAccessIp}</div>
 		</div>
 	</div>
 

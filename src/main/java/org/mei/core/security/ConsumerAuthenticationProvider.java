@@ -1,5 +1,7 @@
 package org.mei.core.security;
 
+import org.mei.core.security.service.ConsumerDetailsService;
+import org.mei.core.security.service.ConsumerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -11,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,12 +25,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ConsumerAuthenticationProvider implements AuthenticationProvider {
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerAuthenticationProvider.class);
 
-	private final UserDetailsService userDetailsService;
+	private final ConsumerDetailsService consumerDetailsService;
 	private PasswordEncoder passwordEncoder = NoOpPasswordEncoder.getInstance();
 	private MessageSourceAccessor messageSourceAccessor = SpringSecurityMessageSource.getAccessor();
 
-	public ConsumerAuthenticationProvider(UserDetailsService userDetailsService) {
-		this.userDetailsService = userDetailsService;
+	public ConsumerAuthenticationProvider(ConsumerDetailsService consumerDetailsService) {
+		this.consumerDetailsService = consumerDetailsService;
 	}
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
@@ -46,7 +47,7 @@ public class ConsumerAuthenticationProvider implements AuthenticationProvider {
 		String username = authentication.getName();
 		String password = (String) authentication.getCredentials();
 
-		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+		UserDetails userDetails = consumerDetailsService.loadUserByUsername(username);
 
 		if (userDetails == null) {
 			throw new UsernameNotFoundException(messageSourceAccessor.getMessage("DigestAuthenticationFilter.usernameNotFound", new String[]{ username }));
@@ -69,7 +70,13 @@ public class ConsumerAuthenticationProvider implements AuthenticationProvider {
 			throw new LockedException(messageSourceAccessor.getMessage("AbstractUserDetailsAuthenticationProvider.locked"));
 		}
 
-		return new UsernamePasswordAuthenticationToken(userDetails, passwordEncoder.encode(password), userDetails.getAuthorities());
+		Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, passwordEncoder.encode(password), userDetails.getAuthorities());
+		ConsumerService consumerService = consumerDetailsService.getConsumerService();
+
+		// 로그인 후 회원정보를 업데이트한다
+		if (consumerService != null) consumerService.saveMemberLoginSuccess(authentication, userDetails);
+
+		return auth;
 	}
 
 	@Override

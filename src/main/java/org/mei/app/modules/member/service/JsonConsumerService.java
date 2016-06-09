@@ -2,12 +2,15 @@ package org.mei.app.modules.member.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mei.app.modules.member.domain.Member;
 import org.mei.core.security.service.Consumer;
 import org.mei.core.security.service.ConsumerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -37,6 +40,11 @@ public class JsonConsumerService implements ConsumerService {
 			if (userId.equals(username)) return consumer;
 		}
 
+		return null;
+	}
+
+	@Override
+	public Member saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails) {
 		return null;
 	}
 }

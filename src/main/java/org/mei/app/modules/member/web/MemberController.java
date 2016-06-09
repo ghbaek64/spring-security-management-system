@@ -1,5 +1,6 @@
 package org.mei.app.modules.member.web;
 
+import org.mei.app.modules.member.service.MemberService;
 import org.mei.core.module.handler.SuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,8 @@ public class MemberController {
 	@Autowired
 	private SessionRegistry sessionRegistry;
 
+	@Resource(name= "memberService") private MemberService memberService;
+
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public ModelAndView dispMemberLogin(
 			@RequestParam(name = "redirect_url", required = false) String redirectUrl,
@@ -42,10 +45,10 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')")
 	@RequestMapping(value = "/mypage", method = RequestMethod.GET)
 	public ModelAndView dispMemberMypage(Authentication authentication) {
-		System.out.println(authentication.toString());
-		System.out.println(authentication.getPrincipal());
-		System.out.println(authentication.getDetails().toString());
 		ModelAndView mav = new ModelAndView("/app/modules/member/mypage");
+
+		mav.addObject("member", memberService.getMemberObject(authentication.getName()));
+
 		return mav;
 	}
 

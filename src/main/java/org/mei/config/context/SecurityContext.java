@@ -20,7 +20,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +45,7 @@ public class SecurityContext {
 
 	@Autowired Properties mei;
 
-	@Resource(name="memberService") private ConsumerService consumerService;
+	@Resource(name= "memberService") private ConsumerService consumerService;
 
 	private PasswordEncoder passwordEncoder;
 
@@ -90,8 +89,8 @@ public class SecurityContext {
 		 */
 		passwordEncoder = getPasswordEncoder();
 		//UserDetailsService userDetailsService = new ConsumerDetailsService(new JsonConsumerService());
-		UserDetailsService userDetailsService = new ConsumerDetailsService(consumerService);
-		ConsumerAuthenticationProvider consumerAuthenticationProvider = new ConsumerAuthenticationProvider(userDetailsService);
+		ConsumerDetailsService consumerDetailsService = new ConsumerDetailsService(consumerService);
+		ConsumerAuthenticationProvider consumerAuthenticationProvider = new ConsumerAuthenticationProvider(consumerDetailsService);
 		consumerAuthenticationProvider.setPasswordEncoder(passwordEncoder);
 
 		auth.authenticationProvider(consumerAuthenticationProvider);
@@ -203,7 +202,7 @@ public class SecurityContext {
 			http
 					.sessionManagement()
 					.sessionAuthenticationStrategy(sas)
-					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+					.sessionCreationPolicy(SessionCreationPolicy.NEVER)
 
 					.and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint)
 					.and().exceptionHandling().accessDeniedHandler(accessFailureHandler)
