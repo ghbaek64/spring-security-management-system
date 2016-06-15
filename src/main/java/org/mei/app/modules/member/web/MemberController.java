@@ -3,7 +3,6 @@ package org.mei.app.modules.member.web;
 import org.mei.app.modules.member.service.MemberService;
 import org.mei.core.module.handler.SuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
@@ -42,7 +41,6 @@ public class MemberController {
 		return mav;
 	}
 
-	@PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')")
 	@RequestMapping(value = "/mypage", method = RequestMethod.GET)
 	public ModelAndView dispMemberMypage(Authentication authentication) {
 		ModelAndView mav = new ModelAndView("/app/modules/member/mypage");
@@ -52,7 +50,6 @@ public class MemberController {
 		return mav;
 	}
 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/visitor", method = RequestMethod.GET)
 	public ModelAndView dispMemberVisitor() {
 		ModelAndView mav = new ModelAndView("/app/modules/member/visitor");
@@ -90,7 +87,6 @@ public class MemberController {
 		return mav;
 	}
 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/visitor", method = RequestMethod.DELETE)
 	public @ResponseBody SuccessHandler procMemberVisitorDelete(@RequestBody Map< String, Object> data) {
 		SessionInformation session = sessionRegistry.getSessionInformation((String) data.get("sessionId"));

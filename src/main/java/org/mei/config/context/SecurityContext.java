@@ -1,11 +1,15 @@
 package org.mei.config.context;
 
 import org.mei.core.security.ConsumerAuthenticationProvider;
+import org.mei.core.security.access.AccessMatchingRole;
+import org.mei.core.security.access.AccessRoleBased;
 import org.mei.core.security.filter.SecurityMetadataSource;
 import org.mei.core.security.handler.*;
 import org.mei.core.security.password.ShaPasswordEncoder;
 import org.mei.core.security.service.ConsumerDetailsService;
 import org.mei.core.security.service.ConsumerService;
+import org.mei.core.security.service.RoleService;
+import org.mei.core.security.service.RoleServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +31,6 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.session.*;
@@ -222,10 +225,13 @@ public class SecurityContext {
 			rememberMeServices.setTokenValiditySeconds(60 * 60 * 24 * 31); // 1 month
 			// Remember ME Service
 
-			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
-			filterSecurityInterceptor.setAuthenticationManager(authenticationManager);
-			filterSecurityInterceptor.setSecurityMetadataSource(new SecurityMetadataSource());
+			RoleService roleService = new RoleServiceImpl();
+			AccessMatchingRole accessMatchingRole = new AccessMatchingRole(roleService);
 
+			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+			filterSecurityInterceptor.setSecurityMetadataSource(new SecurityMetadataSource(accessMatchingRole));
+			filterSecurityInterceptor.setAuthenticationManager(authenticationManager);
+			filterSecurityInterceptor.setAccessDecisionManager(new AccessRoleBased());
 
 			http
 					.sessionManagement()
