@@ -37,7 +37,7 @@ public class SecurityMetadataSource implements FilterInvocationSecurityMetadataS
 		if (logger.isDebugEnabled()) {
 			logger.debug("request path: " + path);
 			logger.debug("request method: " + method);
-			logger.debug("need roles: " + roles.toString());
+			logger.debug("need roles: " + roles);
 		}
 
 		return roles;

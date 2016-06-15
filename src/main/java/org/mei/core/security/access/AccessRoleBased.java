@@ -12,7 +12,9 @@ import org.springframework.security.authentication.AuthenticationTrustResolverIm
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.SpringSecurityMessageSource;
+import org.springframework.security.web.FilterInvocation;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 
 /**
@@ -29,6 +31,11 @@ public class AccessRoleBased implements AccessDecisionManager {
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
 
 		if (authentication == null) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
+
+		FilterInvocation fi = (FilterInvocation) object;
+		HttpServletRequest request = fi.getRequest();
+		String path = request.getServletPath();
+		String method = request.getMethod();
 
 		// ROLE_ANONYMOUS 인 경우
 		if (authenticationTrustResolver.isAnonymous(authentication)) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));

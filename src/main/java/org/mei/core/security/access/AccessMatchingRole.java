@@ -51,7 +51,9 @@ public class AccessMatchingRole {
 				if (ArrayUtils.indexOf(methods, method) > -1) continue;
 			}
 
-			if (antPathMatchers.matches(pattern, url)) return SecurityConfig.createList(roleName);
+			if (antPathMatchers.matches(pattern, url)) {
+				return (roleName == null) ? null : SecurityConfig.createList(roleName);
+			}
 		}
 
 		return null;
