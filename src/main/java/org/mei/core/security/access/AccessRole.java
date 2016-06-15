@@ -1,8 +1,8 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.enums.Method;
+import org.springframework.security.access.ConfigAttribute;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * url (AntiStyle pattern)에 대해 룰을 설정한다.
@@ -14,25 +14,36 @@ public class AccessRole {
 	/**
 	 * url or AntiStyle patterns
 	 */
-	private String pattern;
+	private final String pattern;
 	/**
 	 * Request Mehtod
 	 */
-	private Method[] method;
+	private List<MehtodAttribute> method;
 	/**
 	 * path에 대한 접근 허용여부.
 	 */
-	private boolean allow = true;
+	private boolean allow;
 	/**
 	 * 대상 룰
 	 */
-	private String[] roleName;
+	private final List<ConfigAttribute> roleName;
 
-	public AccessRole() {
+	public AccessRole(String pattern) {
+		this(pattern, null, true, null);
 	}
 
-	public AccessRole(String pattern, String[] roleName) {
+	public AccessRole(String pattern, List<ConfigAttribute> roleName) {
+		this(pattern, null, true, roleName);
+	}
+
+	public AccessRole(String pattern, List<MehtodAttribute> method, List<ConfigAttribute> roleName) {
+		this(pattern, method, true, roleName);
+	}
+
+	public AccessRole(String pattern, List<MehtodAttribute> method, boolean allow, List<ConfigAttribute> roleName) {
 		this.pattern = pattern;
+		this.method = method;
+		this.allow = allow;
 		this.roleName = roleName;
 	}
 
@@ -40,15 +51,11 @@ public class AccessRole {
 		return pattern;
 	}
 
-	public void setPattern(String pattern) {
-		this.pattern = pattern;
-	}
-
-	public Method[] getMethod() {
+	public List<MehtodAttribute> getMethod() {
 		return method;
 	}
 
-	public void setMethod(Method[] method) {
+	public void setMethod(List<MehtodAttribute> method) {
 		this.method = method;
 	}
 
@@ -60,21 +67,17 @@ public class AccessRole {
 		this.allow = allow;
 	}
 
-	public String[] getRoleName() {
+	public List<ConfigAttribute> getRoleName() {
 		return roleName;
-	}
-
-	public void setRoleName(String[] roleName) {
-		this.roleName = roleName;
 	}
 
 	@Override
 	public String toString() {
-		return "Role{" +
+		return "AccessRole{" +
 				"pattern='" + pattern + '\'' +
-				", method=" + Arrays.toString(method) +
+				", method=" + method +
 				", allow=" + allow +
-				", roleName=" + Arrays.toString(roleName) +
+				", roleName=" + roleName +
 				'}';
 	}
 }

@@ -2,10 +2,12 @@ package org.mei.core.security.service;
 
 import org.mei.core.security.access.AccessPermission;
 import org.mei.core.security.access.AccessRole;
+import org.mei.core.security.access.InMemoryAccessRole;
 import org.mei.core.security.enums.Permission;
+import org.springframework.security.access.SecurityConfig;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -14,24 +16,31 @@ import java.util.List;
  */
 public class RoleServiceImpl implements RoleService {
 	List<AccessRole> accessRoleList;
-	List<AccessPermission> accessPermissionList;
+	Map<String, List<AccessPermission>> accessPermissionMap;
 
 	public RoleServiceImpl() {
-		accessRoleList = new ArrayList<>();
-		accessRoleList.add(new AccessRole("/member/login", null));
-		accessRoleList.add(new AccessRole("/member/mypage",new String[]{"ROLE_USER", "ROLE_ADMIN" }));
-		accessRoleList.add(new AccessRole("/**",new String[]{"ROLE_USER", "ROLE_ADMIN" }));
+		InMemoryAccessRole inMemoryAccessRole = new InMemoryAccessRole();
+		inMemoryAccessRole.add(new AccessRole("/board/**", SecurityConfig.createList("ROLE_PERM_0001")));
+		inMemoryAccessRole.add(new AccessRole("/member/login", null));
+		inMemoryAccessRole.add(new AccessRole("/member/mypage", SecurityConfig.createList("ROLE_USER", "ROLE_ADMIN")));
+		inMemoryAccessRole.add(new AccessRole("/**", SecurityConfig.createList("ROLE_USER", "ROLE_ADMIN")));
 
+		inMemoryAccessRole.add("ROLE_PERM_0001", new AccessPermission("ROLE_PERM_0001", "/board", Permission.LIST));
+		inMemoryAccessRole.add("ROLE_PERM_0001", new AccessPermission("ROLE_PERM_0001", "/board/view", Permission.VIEW));
+		inMemoryAccessRole.add("ROLE_PERM_0001", new AccessPermission("ROLE_PERM_0001", "/board/write", Permission.WRITE));
+		inMemoryAccessRole.add("ROLE_PERM_0001", new AccessPermission("ROLE_PERM_0001", "/board/delete", Permission.MANAGER));
 
-		accessPermissionList = new ArrayList<>();
-		accessPermissionList.add(new AccessPermission("ROLE_USER", "/board", Permission.LIST));
-		accessPermissionList.add(new AccessPermission("ROLE_USER", "/board/view", Permission.VIEW));
-		accessPermissionList.add(new AccessPermission("ROLE_ADMIN", "/board/write", Permission.WRITE));
-		accessPermissionList.add(new AccessPermission("ROLE_ADMIN", "/board/delete", Permission.MANAGER));
+		accessRoleList = inMemoryAccessRole.getAccessRole();
+		accessPermissionMap = inMemoryAccessRole.getAccessPermission();
 	}
 
 	@Override
 	public List<AccessRole> getRoleList() {
 		return accessRoleList;
+	}
+
+	@Override
+	public List<AccessPermission> getPermissionList(String roleName) {
+		return accessPermissionMap.get(roleName);
 	}
 }

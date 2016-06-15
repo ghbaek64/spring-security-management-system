@@ -1,11 +1,10 @@
 package org.mei.core.security.access;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.mei.core.security.enums.Method;
+import org.mei.core.security.enums.Permission;
 import org.mei.core.security.service.RoleService;
 import org.mei.core.util.AntPathMatchers;
 import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.SecurityConfig;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,16 +42,37 @@ public class AccessMatchingRole {
 		if (roleList == null) return null;
 
 		for(AccessRole role : roleList) {
-			String pattern = role.getPattern();
-			Method[] methods = role.getMethod();
-			String[] roleName = role.getRoleName();
+			List<MehtodAttribute> methods = role.getMethod();
 
 			if (methods != null) {
-				if (ArrayUtils.indexOf(methods, method) > -1) continue;
+				if (methods.indexOf(method) == -1) continue;
 			}
 
+			String pattern = role.getPattern();
 			if (antPathMatchers.matches(pattern, url)) {
-				return (roleName == null) ? null : SecurityConfig.createList(roleName);
+				Collection<ConfigAttribute> roleName = role.getRoleName();
+				return (roleName == null) ? null : roleName;
+			}
+		}
+
+		return null;
+	}
+
+	public Permission needPermission(String roleName, String url, Method method) {
+		List<AccessPermission> accessPermissionList = roleService.getPermissionList(roleName);
+
+		if (accessPermissionList == null) return null;
+
+		for(AccessPermission accessPermission : accessPermissionList) {
+			List<MehtodAttribute> methods = accessPermission.getMethod();
+
+			if (methods != null) {
+				if (methods.indexOf(method) == -1) continue;
+			}
+
+			String pattern = accessPermission.getPattern();
+			if (antPathMatchers.matches(pattern, url)) {
+				return accessPermission.getPermission();
 			}
 		}
 

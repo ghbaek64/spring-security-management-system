@@ -1,9 +1,8 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -11,17 +10,26 @@ import java.util.Arrays;
  * @since 16. 6. 15.
  */
 public class AccessPermission {
-	private String roleName;
-	private String path;
-	private Method[] method;
+	/**
+	 * The Role name.
+	 */
+	private final String roleName;
+	private final String pattern;
+	private List<MehtodAttribute> method;
 	private Permission permission;
 
-	public AccessPermission() {
+	public AccessPermission(String roleName, String pattern) {
+		this(roleName, pattern, null, null);
 	}
 
-	public AccessPermission(String roleName, String path, Permission permission) {
+	public AccessPermission(String roleName, String pattern, Permission permission) {
+		this(roleName, pattern, null, permission);
+	}
+
+	public AccessPermission(String roleName, String pattern, List<MehtodAttribute> method, Permission permission) {
 		this.roleName = roleName;
-		this.path = path;
+		this.pattern = pattern;
+		this.method = method;
 		this.permission = permission;
 	}
 
@@ -29,23 +37,15 @@ public class AccessPermission {
 		return roleName;
 	}
 
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
+	public String getPattern() {
+		return pattern;
 	}
 
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public Method[] getMethod() {
+	public List<MehtodAttribute> getMethod() {
 		return method;
 	}
 
-	public void setMethod(Method[] method) {
+	public void setMethod(List<MehtodAttribute> method) {
 		this.method = method;
 	}
 
@@ -61,8 +61,8 @@ public class AccessPermission {
 	public String toString() {
 		return "AccessPermission{" +
 				"roleName='" + roleName + '\'' +
-				", path='" + path + '\'' +
-				", method=" + Arrays.toString(method) +
+				", pattern='" + pattern + '\'' +
+				", method=" + method +
 				", permission=" + permission +
 				'}';
 	}

@@ -1,5 +1,6 @@
 package org.mei.core.security.service;
 
+import org.mei.core.security.access.AccessPermission;
 import org.mei.core.security.access.AccessRole;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface RoleService {
 	 * @return
 	 */
 	List<AccessRole> getRoleList();
+
+	List<AccessPermission> getPermissionList(String roleName);
 }

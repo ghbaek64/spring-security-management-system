@@ -11,5 +11,6 @@ public enum Permission {
 	WRITE,
 	VIEW,
 	LIST,
-	ACCESS
+	ACCESS,
+	NONE
 }

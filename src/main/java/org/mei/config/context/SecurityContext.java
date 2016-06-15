@@ -231,7 +231,7 @@ public class SecurityContext {
 			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
 			filterSecurityInterceptor.setSecurityMetadataSource(new SecurityMetadataSource(accessMatchingRole));
 			filterSecurityInterceptor.setAuthenticationManager(authenticationManager);
-			filterSecurityInterceptor.setAccessDecisionManager(new AccessRoleBased());
+			filterSecurityInterceptor.setAccessDecisionManager(new AccessRoleBased(accessMatchingRole));
 
 			http
 					.sessionManagement()
@@ -267,7 +267,7 @@ public class SecurityContext {
 					.addFilter(usernamePasswordAuthenticationFilter)
 					.addFilter(filterSecurityInterceptor)
 					.csrf().disable()
-					.authorizeRequests(); // 없으면 오류 발생 (알수없음)
+					.authorizeRequests();
 		}
 	}
 

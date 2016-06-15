@@ -1,9 +1,10 @@
 package org.mei.core.security.service;
 
+import org.mei.core.security.authorization.Privilege;
+import org.mei.core.security.authorization.Role;
+import org.mei.core.security.enums.Permission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -39,8 +40,13 @@ public class ConsumerDetailsService implements UserDetailsService {
 
 			boolean accountNonLocked = !consumer.getRole().equals("ROLE_BLOCK");
 
-			Set<GrantedAuthority> authorities = new HashSet<>();
-			authorities.add(new SimpleGrantedAuthority(consumer.getRole()));
+			Set<Role> authorities = new HashSet<>();
+			authorities.add(new Role(consumer.getRole(), null));
+
+			Set<Privilege> privileges = new HashSet<>();
+			privileges.add(new Privilege(Permission.LIST));
+			privileges.add(new Privilege(Permission.WRITE));
+			authorities.add(new Role("ROLE_PERM_0001", privileges));
 
 			return new User(consumer.getUserId(), consumer.getPassword(), true, true, true, accountNonLocked, authorities);
 		} catch (Exception e) {
