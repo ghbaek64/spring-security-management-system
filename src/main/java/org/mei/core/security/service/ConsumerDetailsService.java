@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -40,10 +40,10 @@ public class ConsumerDetailsService implements UserDetailsService {
 
 			boolean accountNonLocked = !consumer.getRole().equals("ROLE_BLOCK");
 
-			Set<Role> authorities = new HashSet<>();
+			List<Role> authorities = new ArrayList<>();
 			authorities.add(new Role(consumer.getRole(), null));
 
-			Set<Privilege> privileges = new HashSet<>();
+			List<Privilege> privileges = new ArrayList<>();
 			privileges.add(new Privilege(Permission.LIST));
 			privileges.add(new Privilege(Permission.WRITE));
 			authorities.add(new Role("ROLE_PERM_0001", privileges));

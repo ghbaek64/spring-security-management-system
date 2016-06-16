@@ -1,6 +1,7 @@
 package org.mei.core.security.authentication;
 
 import org.mei.core.security.authorization.Role;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import java.util.ArrayList;
@@ -19,12 +20,15 @@ public class ConsumerAuthenticationResolver {
 		this.authentication = authentication;
 		this.hasRoles = new ArrayList<String>();
 
+		// 로그인하지 않아도 세션이 생성되면 ROLE_ANONYMOUS 가질수 있으면 Role로 캐스팅이 되지 않는 다.
 		if (authentication != null) {
-
-			List<Role> authorities = (List<Role>) authentication.getAuthorities();
-
-			for (Role role : authorities) {
-				this.hasRoles.add(role.getRoleName());
+			if (authentication instanceof AnonymousAuthenticationToken) {
+				this.hasRoles.add("ROLE_ANONYMOUS");
+			} else {
+				List<Role> authorities = (List<Role>) authentication.getAuthorities();
+				for (Role role : authorities) {
+					this.hasRoles.add(role.getAuthority());
+				}
 			}
 		}
 	}

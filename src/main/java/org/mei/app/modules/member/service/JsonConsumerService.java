@@ -2,7 +2,6 @@ package org.mei.app.modules.member.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mei.app.modules.member.domain.Member;
 import org.mei.core.security.service.Consumer;
 import org.mei.core.security.service.ConsumerService;
 import org.slf4j.Logger;
@@ -44,7 +43,7 @@ public class JsonConsumerService implements ConsumerService {
 	}
 
 	@Override
-	public Member saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails) {
+	public Consumer saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails) {
 		return null;
 	}
 }

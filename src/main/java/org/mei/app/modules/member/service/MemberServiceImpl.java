@@ -29,14 +29,8 @@ public class MemberServiceImpl implements ConsumerService, MemberService {
 		return memberDAO.findByUserId(userId);
 	}
 
-	@Override
-	public Consumer getConsumerDetails(String username) throws Exception {
-		Member member = this.getMemberObject(username);
-
-		if (member == null) return null;
-
-		Consumer consumer = new Consumer();
-		consumer.setUserId(member.getUserId());
+	private Consumer getMemberToConsumer(Member member) {
+		Consumer consumer = new Consumer(member.getUserId());
 		consumer.setUserName(member.getUserName());
 		consumer.setPassword(member.getPassword());
 		consumer.setRole(member.getRoleName());
@@ -45,7 +39,16 @@ public class MemberServiceImpl implements ConsumerService, MemberService {
 	}
 
 	@Override
-	public Member saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails) {
+	public Consumer getConsumerDetails(String username) throws Exception {
+		Member member = this.getMemberObject(username);
+
+		if (member == null) return null;
+
+		return getMemberToConsumer(member);
+	}
+
+	@Override
+	public Consumer saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails) {
 		WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
 		String userId = userDetails.getUsername();
 		Member member = memberDAO.findByUserId(userId);
@@ -57,6 +60,6 @@ public class MemberServiceImpl implements ConsumerService, MemberService {
 
 		memberDAO.saveAndFlush(member);
 
-		return member;
+		return getMemberToConsumer(member);
 	}
 }

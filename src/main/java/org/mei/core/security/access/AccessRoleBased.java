@@ -1,7 +1,6 @@
 package org.mei.core.security.access;
 
 import org.mei.core.security.authentication.ConsumerAuthenticationResolver;
-import org.mei.core.security.authorization.Role;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import org.springframework.security.web.FilterInvocation;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)

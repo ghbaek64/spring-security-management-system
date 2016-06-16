@@ -25,5 +25,5 @@ public interface ConsumerService {
 	 *
 	 * @return
 	 */
-	Member saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails);
+	Consumer saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails);
 }

@@ -6,13 +6,10 @@ package org.mei.core.security.service;
  * @since 16. 6. 7.
  */
 public class Consumer {
-	private String userId;
+	private final String userId;
 	private String password;
 	private String userName;
 	private String role;
-
-	public Consumer() {
-	}
 
 	public Consumer(String userId) {
 		this.userId = userId;
@@ -20,10 +17,6 @@ public class Consumer {
 
 	public String getUserId() {
 		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String getPassword() {
