@@ -1,5 +1,6 @@
 package org.mei.core.security.access;
 
+import org.mei.core.security.authentication.ConsumerAuthenticationResolver;
 import org.mei.core.security.authorization.Role;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
@@ -20,6 +21,7 @@ import org.springframework.security.web.FilterInvocation;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -43,37 +45,63 @@ public class AccessRoleBased implements AccessDecisionManager {
 		String path = request.getServletPath();
 		String method = request.getMethod();
 
-		if (configAttributes == null) return;
+		List<ConfigAttribute> needConfigAttributes = (List<ConfigAttribute>) configAttributes;
+		List<Permission> needPermissions = accessMatchingRole.needPermissions(configAttributes, path, Method.valueOf(method));
+		AccessRole needRole = accessMatchingRole.needRole(path, Method.valueOf(method));
 
-		List<ConfigAttribute> needRoles = (List<ConfigAttribute>) configAttributes;
-		String needRole = null;
-		for(ConfigAttribute configAttribute : needRoles) {
-			String role = configAttribute.getAttribute();
-			if (role == null) continue;
-			if (role.startsWith("ROLE_PERM_")) needRole = role;
-		}
+		if (authentication == null) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
 
-		Permission needPermission = accessMatchingRole.needPermission(needRole, path, Method.valueOf(method));
+		ConsumerAuthenticationResolver consumerAuthenticationResolver = new ConsumerAuthenticationResolver(authentication);
+		List<String> hasRoles = consumerAuthenticationResolver.getHasRoles();
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("request path: " + path);
 			logger.debug("request method: " + method);
+			logger.debug("need configAttributes: " + needConfigAttributes);
 			logger.debug("need role: " + needRole);
-			logger.debug("need permission: " + needPermission);
+			logger.debug("need permission: " + needPermissions);
+			logger.debug("has roles: " + hasRoles);
 		}
 
-		if (configAttributes == null && needPermission == null) return;
 
-		if (authentication == null) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
+		boolean error = true;
 
-		// ROLE_ANONYMOUS 인 경우
-		if (authenticationTrustResolver.isAnonymous(authentication)) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
+		if (needRole == null) {
+			error = false;
+		} else {
 
-		Collection<Role> authorities = (Collection<Role>) authentication.getAuthorities();
+			boolean isAllow = needRole.isAllow();
+			List<ConfigAttribute> roleNames = needRole.getRoleName();
+
+			if (isAllow && roleNames.size() == 0) { // 모두 허용
+				error = false;
+			} else if(!isAllow && roleNames.size() == 0) { // 모두 차단
+				error = true;
+			} else {
+				for (ConfigAttribute attribute : roleNames) {
+					// 권한이 있는 경우
+					if (hasRoles.indexOf(attribute.getAttribute()) > -1) {
+						error = !isAllow;
+						break;
+					}
+				}
+			}
+		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("has roles: " + authorities);
+			logger.debug("Access is allow check: " + error);
 		}
+
+		if (error) {
+
+			// ROLE_ANONYMOUS 인 경우
+			if (authenticationTrustResolver.isAnonymous(authentication)) {
+				throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
+			} else {
+				throw new AccessDeniedException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
+			}
+		}
+
 	}
 
 	@Override
