@@ -20,7 +20,7 @@ public class RoleServiceImpl implements RoleService {
 
 	public RoleServiceImpl() {
 		InMemoryAccessRole inMemoryAccessRole = new InMemoryAccessRole();
-		inMemoryAccessRole.add(new AccessRole("/board/delete", null, false, SecurityConfig.createList("ROLE_ADMIN")));
+		//inMemoryAccessRole.add(new AccessRole("/board/delete", null, false, SecurityConfig.createList("ROLE_ADMIN")));
 		inMemoryAccessRole.add(new AccessRole("/board/**", SecurityConfig.createList("ROLE_PERM_0001")));
 		inMemoryAccessRole.add(new AccessRole("/member/login", null));
 		inMemoryAccessRole.add(new AccessRole("/member/mypage", SecurityConfig.createList("ROLE_USER", "ROLE_ADMIN")));

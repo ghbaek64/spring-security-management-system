@@ -28,6 +28,11 @@ public class AccessRole {
 	 */
 	private final List<ConfigAttribute> roleName;
 
+	/**
+	 * 퍼미션 체크 대상여부.
+	 */
+	private boolean isPermission;
+
 	public AccessRole(String pattern) {
 		this(pattern, null, true, null);
 	}

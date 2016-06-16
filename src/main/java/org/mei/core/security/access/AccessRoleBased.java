@@ -1,6 +1,7 @@
 package org.mei.core.security.access;
 
 import org.mei.core.security.authentication.ConsumerAuthenticationResolver;
+import org.mei.core.security.authorization.Privilege;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
 import org.slf4j.Logger;
@@ -37,6 +38,8 @@ public class AccessRoleBased implements AccessDecisionManager {
 	private MessageSourceAccessor messageSourceAccessor = SpringSecurityMessageSource.getAccessor();
 	private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
+	private ConsumerAuthenticationResolver consumerAuthenticationResolver;
+
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
 		FilterInvocation fi = (FilterInvocation) object;
 		HttpServletRequest request = fi.getRequest();
@@ -44,23 +47,21 @@ public class AccessRoleBased implements AccessDecisionManager {
 		String method = request.getMethod();
 
 		List<ConfigAttribute> needConfigAttributes = (List<ConfigAttribute>) configAttributes;
-		List<Permission> needPermissions = accessMatchingRole.needPermissions(configAttributes, path, Method.valueOf(method));
 		AccessRole needRole = accessMatchingRole.needRole(path, Method.valueOf(method));
 
-		if (authentication == null) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
+		if (authentication == null)
+			throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
 
-		ConsumerAuthenticationResolver consumerAuthenticationResolver = new ConsumerAuthenticationResolver(authentication);
-		List<String> hasRoles = consumerAuthenticationResolver.getHasRoles();
+		consumerAuthenticationResolver = new ConsumerAuthenticationResolver(authentication);
+		List<String> hasAuthorities = consumerAuthenticationResolver.getHasAuthorities();
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("request path: " + path);
 			logger.debug("request method: " + method);
 			logger.debug("need configAttributes: " + needConfigAttributes);
 			logger.debug("need role: " + needRole);
-			logger.debug("need permission: " + needPermissions);
-			logger.debug("has roles: " + hasRoles);
+			logger.debug("has Authorities: " + hasAuthorities);
 		}
-
 
 		boolean error = true;
 
@@ -73,12 +74,12 @@ public class AccessRoleBased implements AccessDecisionManager {
 
 			if (isAllow && roleNames.size() == 0) { // 모두 허용
 				error = false;
-			} else if(!isAllow && roleNames.size() == 0) { // 모두 차단
+			} else if (!isAllow && roleNames.size() == 0) { // 모두 차단
 				error = true;
 			} else {
 				for (ConfigAttribute attribute : roleNames) {
 					// 권한이 있는 경우
-					if (hasRoles.indexOf(attribute.getAttribute()) > -1) {
+					if (hasAuthorities.indexOf(attribute.getAttribute()) > -1) {
 						error = !isAllow;
 						break;
 					}
@@ -91,7 +92,6 @@ public class AccessRoleBased implements AccessDecisionManager {
 		}
 
 		if (error) {
-
 			// ROLE_ANONYMOUS 인 경우
 			if (authenticationTrustResolver.isAnonymous(authentication)) {
 				throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
@@ -100,6 +100,25 @@ public class AccessRoleBased implements AccessDecisionManager {
 			}
 		}
 
+		// 퍼미션 체크
+		for (ConfigAttribute configAttribute : needRole.getRoleName()) {
+			String roleName = configAttribute.getAttribute();
+			Permission permission = accessMatchingRole.needPermission(roleName, path, Method.valueOf(method));
+
+			if (permission == null) continue;
+			if (permission == Permission.NONE) continue;
+
+			List<Permission> hasPermissions = consumerAuthenticationResolver.getHasPermissions(roleName);
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("need permission: " + permission);
+				logger.debug("has permission: " + hasPermissions);
+			}
+
+			if (hasPermissions.indexOf(Permission.NONE) > -1 || hasPermissions.indexOf(permission) == -1) {
+				throw new AccessDeniedException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
+			}
+		}
 	}
 
 	@Override
