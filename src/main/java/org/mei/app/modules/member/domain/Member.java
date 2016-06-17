@@ -2,6 +2,7 @@ package org.mei.app.modules.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
+import org.mei.core.orm.support.BooleanToIntegerConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,6 +19,7 @@ public class Member implements Serializable {
 
 	private static final long serialVersionUID = 7266752152183703556L;
 
+	@Column(name = "member_idx")
 	@Id
 	@GeneratedValue(generator = "IdGenerator")
 	@GenericGenerator(
@@ -28,7 +30,6 @@ public class Member implements Serializable {
 					@org.hibernate.annotations.Parameter(name = "prefix", value = "MEM"),
 					@org.hibernate.annotations.Parameter(name = "pad", value = "17")
 			})
-	@Column(name = "member_idx")
 	String memberIdx;
 
 	@Column(name = "user_id")
@@ -43,12 +44,12 @@ public class Member implements Serializable {
 	@Column(name = "password")
 	String password;
 
-	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "reg_date")
+	@Temporal(TemporalType.TIMESTAMP)
 	Date regDate;
 
-	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "last_access_date")
+	@Temporal(TemporalType.TIMESTAMP)
 	Date lastAccessDate;
 
 	@Column(name = "last_access_ip")
@@ -59,6 +60,10 @@ public class Member implements Serializable {
 
 	@Column(name = "role_name")
 	String roleName;
+
+	@Column(name = "account_block")
+	@Convert(converter=BooleanToIntegerConverter.class)
+	Boolean accountBlock;
 
 	public String getMemberIdx() {
 		return memberIdx;
@@ -138,5 +143,13 @@ public class Member implements Serializable {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+
+	public boolean isAccountBlock() {
+		return accountBlock;
+	}
+
+	public void setAccountBlock(boolean accountBlock) {
+		this.accountBlock = accountBlock;
 	}
 }

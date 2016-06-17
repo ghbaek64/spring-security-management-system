@@ -2,16 +2,18 @@ package org.mei.app.modules.member.service;
 
 import org.mei.app.modules.member.dao.MemberDAO;
 import org.mei.app.modules.member.domain.Member;
-import org.mei.core.security.service.Consumer;
+import org.mei.core.security.authorization.Authority;
+import org.mei.core.security.authorization.Consumer;
+import org.mei.core.security.authorization.Privilege;
+import org.mei.core.security.enums.Permission;
 import org.mei.core.security.service.ConsumerService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -29,37 +31,22 @@ public class MemberServiceImpl implements ConsumerService, MemberService {
 		return memberDAO.findByUserId(userId);
 	}
 
-	private Consumer getMemberToConsumer(Member member) {
-		Consumer consumer = new Consumer(member.getUserId());
-		consumer.setUserName(member.getUserName());
-		consumer.setPassword(member.getPassword());
-		consumer.setRole(member.getRoleName());
-
-		return consumer;
-	}
-
 	@Override
-	public Consumer getConsumerDetails(String username) throws Exception {
+	public Consumer loadUserByUsername(String username) throws UsernameNotFoundException {
 		Member member = this.getMemberObject(username);
 
-		if (member == null) return null;
+		if (member == null) throw new UsernameNotFoundException("");
 
-		return getMemberToConsumer(member);
-	}
+		Boolean accountNonLocked = member.isAccountBlock();
 
-	@Override
-	public Consumer saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails) {
-		WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
-		String userId = userDetails.getUsername();
-		Member member = memberDAO.findByUserId(userId);
+		List<Authority> authorities = new ArrayList<>();
+		authorities.add(new Authority(member.getRoleName(), null));
 
-		member.setUserId(userDetails.getUsername());
-		member.setLastAccessIp(details.getRemoteAddress());
-		member.setSessionId(details.getSessionId());
-		member.setLastAccessDate(new Date());
+		List<Privilege> privileges = new ArrayList<>();
+		privileges.add(new Privilege(Permission.LIST));
+		privileges.add(new Privilege(Permission.WRITE));
+		authorities.add(new Authority("ROLE_PERM_0001", privileges));
 
-		memberDAO.saveAndFlush(member);
-
-		return getMemberToConsumer(member);
+		return new Consumer(member.getUserId(), member.getPassword(), !accountNonLocked.booleanValue(), authorities);
 	}
 }

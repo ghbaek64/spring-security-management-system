@@ -1,17 +1,10 @@
 package org.mei.core.security.service;
 
-import org.mei.core.security.authorization.Privilege;
-import org.mei.core.security.authorization.Role;
-import org.mei.core.security.enums.Permission;
+import org.mei.core.security.authorization.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -32,27 +25,7 @@ public class ConsumerDetailsService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		try {
-			Consumer consumer = consumerService.getConsumerDetails(username);
-
-			if (consumer == null) return null;
-
-			boolean accountNonLocked = !consumer.getRole().equals("ROLE_BLOCK");
-
-			List<Role> authorities = new ArrayList<>();
-			authorities.add(new Role(consumer.getRole(), null));
-
-			List<Privilege> privileges = new ArrayList<>();
-			privileges.add(new Privilege(Permission.LIST));
-			privileges.add(new Privilege(Permission.WRITE));
-			authorities.add(new Role("ROLE_PERM_0001", privileges));
-
-			return new User(consumer.getUserId(), consumer.getPassword(), true, true, true, accountNonLocked, authorities);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		return null;
+	public Consumer loadUserByUsername(String username) throws UsernameNotFoundException {
+		return consumerService.loadUserByUsername(username);
 	}
 }

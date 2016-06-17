@@ -1,8 +1,7 @@
 package org.mei.core.security.service;
 
-import org.mei.app.modules.member.domain.Member;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.mei.core.security.authorization.Consumer;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
@@ -18,12 +17,5 @@ public interface ConsumerService {
 	 * @return
 	 * @throws
 	 */
-	Consumer getConsumerDetails(String username) throws Exception;
-
-	/**
-	 * 로그인 완료 후 회원정보를 업데이트한다
-	 *
-	 * @return
-	 */
-	Consumer saveMemberLoginSuccess(Authentication authentication, UserDetails userDetails);
+	Consumer loadUserByUsername(String username) throws UsernameNotFoundException;
 }

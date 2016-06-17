@@ -1,7 +1,6 @@
 package org.mei.core.security.authorization;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -10,14 +9,13 @@ import java.util.List;
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
  */
-public class Role implements GrantedAuthority {
+public class Authority implements GrantedAuthority {
 	private static final long serialVersionUID = -7125481982234132933L;
 
 	private final String role;
 	private final List<Privilege> privilege;
 
-	public Role(String role, List<Privilege> privilege) {
-		Assert.hasText(role, "A granted authority textual representation is required");
+	public Authority(String role, List<Privilege> privilege) {
 		this.role = role;
 		this.privilege = privilege;
 	}
@@ -27,13 +25,17 @@ public class Role implements GrantedAuthority {
 		return role;
 	}
 
+	public List<Privilege> getPrivilege() {
+		return privilege;
+	}
+
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
 
-		if (obj instanceof Role) {
-			return role.equals(((Role) obj).role);
+		if (obj instanceof Authority) {
+			return role.equals(((Authority) obj).role);
 		}
 
 		return false;
@@ -41,10 +43,6 @@ public class Role implements GrantedAuthority {
 
 	public int hashCode() {
 		return this.role.hashCode();
-	}
-
-	public List<Privilege> getPrivilege() {
-		return privilege;
 	}
 
 	@Override
