@@ -5,51 +5,54 @@ import org.springframework.security.access.ConfigAttribute;
 import java.util.List;
 
 /**
- * url (AntiStyle pattern)에 대해 룰을 설정한다.
+ * url (Ant-Style pattern)에 대해 룰 정보
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 13.
  */
-public class AccessRole {
+public class AccessRole implements ConfigAttribute{
 	/**
-	 * url or AntiStyle patterns
+	 * HTTP url or Ant-Style patterns
 	 */
 	private final String pattern;
 	/**
-	 * Request Mehtod
+	 * Request HTTP Mehtod
 	 */
 	private List<MehtodAttribute> method;
 	/**
-	 * path에 대한 접근 허용여부.
+	 * 접근 허용여부.
 	 */
 	private boolean allow;
 	/**
-	 * 대상 룰
+	 * 룰
 	 */
 	private final List<ConfigAttribute> roleName;
 
-	/**
-	 * 퍼미션 체크 대상여부.
-	 */
-	private boolean isPermission;
+	private boolean permissionRole;
 
 	public AccessRole(String pattern) {
-		this(pattern, null, true, null);
+		this(pattern, null, true, null, false);
 	}
 
 	public AccessRole(String pattern, List<ConfigAttribute> roleName) {
-		this(pattern, null, true, roleName);
+		this(pattern, null, true, roleName, false);
 	}
 
 	public AccessRole(String pattern, List<MehtodAttribute> method, List<ConfigAttribute> roleName) {
-		this(pattern, method, true, roleName);
+		this(pattern, method, true, roleName, false);
 	}
 
-	public AccessRole(String pattern, List<MehtodAttribute> method, boolean allow, List<ConfigAttribute> roleName) {
+	public AccessRole(String pattern, List<MehtodAttribute> method, boolean allow, List<ConfigAttribute> roleName, boolean permissionRole) {
 		this.pattern = pattern;
 		this.method = method;
 		this.allow = allow;
 		this.roleName = roleName;
+		this.permissionRole = permissionRole;
+	}
+
+	@Override
+	public String getAttribute() {
+		return (roleName == null) ? null : roleName.toString();
 	}
 
 	public String getPattern() {
@@ -76,6 +79,10 @@ public class AccessRole {
 		return roleName;
 	}
 
+	public boolean isPermissionRole() {
+		return permissionRole;
+	}
+
 	@Override
 	public String toString() {
 		return "AccessRole{" +
@@ -83,6 +90,7 @@ public class AccessRole {
 				", method=" + method +
 				", allow=" + allow +
 				", roleName=" + roleName +
+				", permissionRole=" + permissionRole +
 				'}';
 	}
 }

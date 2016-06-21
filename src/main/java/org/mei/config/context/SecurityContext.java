@@ -8,8 +8,8 @@ import org.mei.core.security.handler.*;
 import org.mei.core.security.password.ShaPasswordEncoder;
 import org.mei.core.security.service.ConsumerDetailsService;
 import org.mei.core.security.service.ConsumerService;
-import org.mei.core.security.service.RoleService;
-import org.mei.core.security.service.RoleServiceImpl;
+import org.mei.core.security.service.AccessControlService;
+import org.mei.core.security.service.AccessControlServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -225,7 +225,7 @@ public class SecurityContext {
 			rememberMeServices.setTokenValiditySeconds(60 * 60 * 24 * 31); // 1 month
 			// Remember ME Service
 
-			RoleService roleService = new RoleServiceImpl();
+			AccessControlService roleService = new AccessControlServiceImpl();
 			AccessMatchingRole accessMatchingRole = new AccessMatchingRole(roleService);
 
 			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();

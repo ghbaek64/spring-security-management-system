@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * HTTP Method 정보
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
@@ -42,7 +43,7 @@ public class SecurityMethod implements MehtodAttribute {
 	}
 
 	public static List<MehtodAttribute> createList(MehtodAttribute... methodAttributes) {
-		Assert.notNull(methodAttributes, "You must supply an array of attribute names");
+		Assert.notNull(methodAttributes, "null을 입력할 수 없습니다.");
 		List<MehtodAttribute> attributes = new ArrayList<>(methodAttributes.length);
 
 		for (MehtodAttribute attribute : methodAttributes) {

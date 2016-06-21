@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 로그인 시도를 실패할 경우
+ * 로그인 실패할 경우 호출되는 헨들러
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 5. 30.

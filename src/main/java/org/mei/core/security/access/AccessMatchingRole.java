@@ -2,7 +2,7 @@ package org.mei.core.security.access;
 
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
-import org.mei.core.security.service.RoleService;
+import org.mei.core.security.service.AccessControlService;
 import org.mei.core.util.AntPathMatchers;
 import org.springframework.security.access.ConfigAttribute;
 
@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * url에 관련된 룰을 조회한다.
+ * Request에 대한 일치하는 권한(Role, Permission)을 조회한다.
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 13.
@@ -19,13 +19,13 @@ import java.util.List;
 public class AccessMatchingRole {
 	private AntPathMatchers antPathMatchers = new AntPathMatchers();
 
-	private final RoleService roleService;
-	public AccessMatchingRole(RoleService roleService) {
-		this.roleService = roleService;
+	private final AccessControlService accessControlService;
+	public AccessMatchingRole(AccessControlService accessControlService) {
+		this.accessControlService = accessControlService;
 	}
 
-	public RoleService getRoleService() {
-		return roleService;
+	public AccessControlService getAccessControlService() {
+		return accessControlService;
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class AccessMatchingRole {
 	 * @return
 	 */
 	public Collection<ConfigAttribute> needConfigAttributes(String url, Method method) {
-		List<AccessRole> roleList = roleService.getRoleList();
+		List<AccessRole> roleList = accessControlService.getAccessRole();
 
 		if (roleList == null) return null;
 
@@ -59,12 +59,13 @@ public class AccessMatchingRole {
 	}
 
 	public AccessRole needRole(String url, Method method) {
-		List<AccessRole> roleList = roleService.getRoleList();
+		List<AccessRole> roleList = accessControlService.getAccessRole();
 
 		if (roleList == null) return null;
 
 		for(AccessRole role : roleList) {
 			List<MehtodAttribute> methods = role.getMethod();
+			if (!role.isPermissionRole()) continue;
 
 			if (methods != null) {
 				if (methods.indexOf(method) == -1) continue;
@@ -83,13 +84,15 @@ public class AccessMatchingRole {
 	 * role의 퍼미션을 조회하고 request 정보와 일치하는 퍼미션을 순차적으로 한개만 찾아 리턴하고 종료한다.
 	 *
 	 * @param roleName Collection<ConfigAttribute> configAttributes
-	 * @param url      AntiStyle pattern
+	 * @param url      Ant-Style pattern
 	 * @param method   Method
 	 * @return Permission
 	 */
 	public Permission needPermission(String roleName, String url, Method method) {
-		List<AccessPermission> accessPermissionList = roleService.getPermissionList(roleName);
+		AccessPermissionRole accessPermissionRole = accessControlService.getAccessPermissionRole(roleName);
+		if (accessPermissionRole == null) return null;
 
+		List<AccessPermission> accessPermissionList = accessPermissionRole.getAccessPermission();
 		if (accessPermissionList == null) return null;
 
 		for(AccessPermission accessPermission : accessPermissionList) {
@@ -112,7 +115,7 @@ public class AccessMatchingRole {
 	 * 다수의 role의 퍼미션을 모두 조회한다.
 	 *
 	 * @param configAttributes roleName
-	 * @param url              AntiStyle pattern
+	 * @param url              Ant-Style pattern
 	 * @param method           Method
 	 * @return List<Permission>
 	 */

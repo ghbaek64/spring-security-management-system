@@ -1,9 +1,9 @@
 package org.mei.core.security.access;
 
 import org.mei.core.security.authentication.ConsumerAuthenticationResolver;
-import org.mei.core.security.authorization.Privilege;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
+import org.mei.core.security.enums.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * 권한 처리 로직
+ * @see AccessDecisionManager
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
@@ -98,6 +100,10 @@ public class AccessRoleBased implements AccessDecisionManager {
 			} else {
 				throw new AccessDeniedException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
 			}
+		}
+
+		if (hasAuthorities.indexOf(Role.ROLE_ADMIN) > -1 || hasAuthorities.indexOf(Role.ROLE_MANAGER) > -1) {
+			return;
 		}
 
 		// 퍼미션 체크

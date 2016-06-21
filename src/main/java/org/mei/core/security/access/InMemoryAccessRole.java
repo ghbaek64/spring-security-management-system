@@ -6,39 +6,43 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 권한 정보 저장소.
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
  */
 public class InMemoryAccessRole {
+	private static final Map<String, AccessBasicPermission> accessBasicPermission;
 	private static final List<AccessRole> accessRole;
-	private static final Map<String, List<AccessPermission>> accessPermission;
+	private static final Map<String, AccessPermissionRole> accessPermissionRole;
 
 	static {
+		accessBasicPermission = new HashMap<>();
 		accessRole = new ArrayList<>();
-		accessPermission = new HashMap<>();
+		accessPermissionRole = new HashMap<>();
+	}
+
+	public void add(AccessBasicPermission permission) {
+		accessBasicPermission.put(permission.getRoleName(), permission);
 	}
 
 	public void add(AccessRole role) {
 		accessRole.add(role);
 	}
 
-	public void add(String roleName, AccessPermission permission) {
-		if (accessPermission.containsKey(roleName)) {
-			accessPermission.get(roleName).add(permission);
-		} else {
-			List<AccessPermission> accessPermissions = new ArrayList<>(1);
-			accessPermissions.add(permission);
-			accessPermission.put(roleName, accessPermissions);
-		}
-
+	public void add(AccessPermissionRole role) {
+		accessPermissionRole.put(role.getRoleName(), role);
 	}
 
-	public List<AccessRole> getAccessRole() {
+	public static Map<String, AccessBasicPermission> getAccessBasicPermission() {
+		return accessBasicPermission;
+	}
+
+	public static List<AccessRole> getAccessRole() {
 		return accessRole;
 	}
 
-	public Map<String, List<AccessPermission>> getAccessPermission() {
-		return accessPermission;
+	public static Map<String, AccessPermissionRole> getAccessPermissionRole() {
+		return accessPermissionRole;
 	}
 }
