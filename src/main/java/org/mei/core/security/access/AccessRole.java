@@ -1,5 +1,6 @@
 package org.mei.core.security.access;
 
+import org.mei.core.security.enums.Method;
 import org.springframework.security.access.ConfigAttribute;
 
 import java.util.List;
@@ -10,87 +11,43 @@ import java.util.List;
  * @site http://syaku.tistory.com
  * @since 16. 6. 13.
  */
-public class AccessRole implements ConfigAttribute{
-	/**
-	 * HTTP url or Ant-Style patterns
-	 */
-	private final String pattern;
-	/**
-	 * Request HTTP Mehtod
-	 */
-	private List<MehtodAttribute> method;
-	/**
-	 * 접근 허용여부.
-	 */
+public class AccessRole {
+
+	private final List<String> pattern;
+	private List<Method> method;
+	private List<String> roleName;
 	private boolean allow;
-	/**
-	 * 룰
-	 */
-	private final List<ConfigAttribute> roleName;
 
-	private boolean permissionRole;
-
-	public AccessRole(String pattern) {
-		this(pattern, null, true, null, false);
-	}
-
-	public AccessRole(String pattern, List<ConfigAttribute> roleName) {
-		this(pattern, null, true, roleName, false);
-	}
-
-	public AccessRole(String pattern, List<MehtodAttribute> method, List<ConfigAttribute> roleName) {
-		this(pattern, method, true, roleName, false);
-	}
-
-	public AccessRole(String pattern, List<MehtodAttribute> method, boolean allow, List<ConfigAttribute> roleName, boolean permissionRole) {
+	public AccessRole(List<String> pattern, List<Method> method, boolean allow, List<String> roleName) {
 		this.pattern = pattern;
 		this.method = method;
 		this.allow = allow;
 		this.roleName = roleName;
-		this.permissionRole = permissionRole;
 	}
 
-	@Override
-	public String getAttribute() {
-		return (roleName == null) ? null : roleName.toString();
-	}
-
-	public String getPattern() {
+	public List<String> getPattern() {
 		return pattern;
 	}
 
-	public List<MehtodAttribute> getMethod() {
+	public List<Method> getMethod() {
 		return method;
 	}
 
-	public void setMethod(List<MehtodAttribute> method) {
-		this.method = method;
+	public List<String> getRoleName() {
+		return roleName;
 	}
 
 	public boolean isAllow() {
 		return allow;
 	}
 
-	public void setAllow(boolean allow) {
-		this.allow = allow;
-	}
-
-	public List<ConfigAttribute> getRoleName() {
-		return roleName;
-	}
-
-	public boolean isPermissionRole() {
-		return permissionRole;
-	}
-
 	@Override
 	public String toString() {
 		return "AccessRole{" +
-				"pattern='" + pattern + '\'' +
+				"pattern=" + pattern +
 				", method=" + method +
-				", allow=" + allow +
 				", roleName=" + roleName +
-				", permissionRole=" + permissionRole +
+				", allow=" + allow +
 				'}';
 	}
 }

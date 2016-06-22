@@ -1,9 +1,6 @@
 package org.mei.core.security.service;
 
-import org.mei.core.security.access.AccessPermission;
-import org.mei.core.security.access.AccessPermissionRole;
-import org.mei.core.security.access.AccessRole;
-import org.mei.core.security.access.AccessBasicPermission;
+import org.mei.core.security.access.*;
 
 import java.util.List;
 import java.util.Map;
@@ -15,19 +12,7 @@ import java.util.Map;
  * @since 2016.06.13
  */
 public interface AccessControlService {
-
-	/**
-	 * 룰에 대한 기본 퍼미션을 리턴한다.
-	 *
-	 * @return
-	 */
-	AccessBasicPermission getAccessBasicPermission(String roleName);
-
-	/**
-	 * 모든 룰을 리턴한다
-	 * @return
-	 */
-	List<AccessRole> getAccessRole();
-
-	AccessPermissionRole getAccessPermissionRole(String roleName);
+	List<AccessRole> getAccessRoleList();
+	List<AccessPermissionRole> getAccessPermissionRoleList();
+	Map<String, BasicPermission> getBasicPermissionObject();
 }

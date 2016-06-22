@@ -46,13 +46,15 @@ public class AccessRoleBased implements AccessDecisionManager {
 		FilterInvocation fi = (FilterInvocation) object;
 		HttpServletRequest request = fi.getRequest();
 		String path = request.getServletPath();
-		String method = request.getMethod();
-
-		List<ConfigAttribute> needConfigAttributes = (List<ConfigAttribute>) configAttributes;
-		AccessRole needRole = accessMatchingRole.needRole(path, Method.valueOf(method));
+		Method method = Method.valueOf(request.getMethod());
 
 		if (authentication == null)
 			throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
+
+		AccessRole needRole = accessMatchingRole.needRole(path, method);
+
+
+
 
 		consumerAuthenticationResolver = new ConsumerAuthenticationResolver(authentication);
 		List<String> hasAuthorities = consumerAuthenticationResolver.getHasAuthorities();

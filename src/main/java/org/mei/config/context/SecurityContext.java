@@ -1,15 +1,14 @@
 package org.mei.config.context;
 
+import org.mei.core.common.object.Collecting;
 import org.mei.core.security.ConsumerAuthenticationProvider;
-import org.mei.core.security.access.AccessMatchingRole;
-import org.mei.core.security.access.AccessRoleBased;
+import org.mei.core.security.access.*;
+import org.mei.core.security.enums.Permission;
 import org.mei.core.security.filter.SecurityMetadataSource;
 import org.mei.core.security.handler.*;
 import org.mei.core.security.password.ShaPasswordEncoder;
 import org.mei.core.security.service.ConsumerDetailsService;
 import org.mei.core.security.service.ConsumerService;
-import org.mei.core.security.service.AccessControlService;
-import org.mei.core.security.service.AccessControlServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +37,7 @@ import org.springframework.security.web.session.ConcurrentSessionFilter;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -225,8 +225,24 @@ public class SecurityContext {
 			rememberMeServices.setTokenValiditySeconds(60 * 60 * 24 * 31); // 1 month
 			// Remember ME Service
 
-			AccessControlService roleService = new AccessControlServiceImpl();
-			AccessMatchingRole accessMatchingRole = new AccessMatchingRole(roleService);
+
+			InMemoryAuthorization inMemoryAuthorization = new InMemoryAuthorization();
+
+			// 기본 권한 설정
+			inMemoryAuthorization
+					.add(new BasicPermission("ROLE_ADMIN", Collecting.createList(Permission.ADMIN)))
+
+					.add(new AccessRole(Collecting.createList("/member/login"), null, true, Collections.EMPTY_LIST))
+					.add(new AccessRole(Collecting.createList("/member/mypage"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
+					.add(new AccessRole(Collecting.createList("/**"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
+
+					.add(new AccessPermissionRole("ROLE_PERM_0001", Collecting.createList("/board/**"), null, Collecting.createList(
+							new AccessPermission(Collecting.createList("/board"), null, Permission.LIST),
+							new AccessPermission(Collecting.createList("/board/view"), null, Permission.VIEW),
+							new AccessPermission(Collecting.createList("/board/write"), null, Permission.WRITE),
+							new AccessPermission(Collecting.createList("/board/delete"), null, Permission.MANAGER))));
+
+			AccessMatchingRole accessMatchingRole = new AccessMatchingRole(inMemoryAuthorization);
 
 			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
 			filterSecurityInterceptor.setSecurityMetadataSource(new SecurityMetadataSource(accessMatchingRole));
@@ -267,7 +283,7 @@ public class SecurityContext {
 					.addFilter(usernamePasswordAuthenticationFilter)
 					.addFilter(filterSecurityInterceptor)
 					.csrf().disable()
-					.authorizeRequests();
+					.authorizeRequests().antMatchers();
 		}
 	}
 

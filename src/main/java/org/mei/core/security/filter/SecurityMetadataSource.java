@@ -32,9 +32,9 @@ public class SecurityMetadataSource implements FilterInvocationSecurityMetadataS
 		String path = request.getServletPath();
 		String method = request.getMethod();
 
-		Collection<ConfigAttribute> roles = accessMatchingRole.needConfigAttributes(path, Method.valueOf(method));
+		Collection<ConfigAttribute> attributes = accessMatchingRole.needConfigAttributes(path, Method.valueOf(method));
 
-		return roles;
+		return attributes;
 	}
 
 	@Override

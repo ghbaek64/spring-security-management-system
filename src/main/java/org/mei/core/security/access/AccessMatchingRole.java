@@ -5,6 +5,7 @@ import org.mei.core.security.enums.Permission;
 import org.mei.core.security.service.AccessControlService;
 import org.mei.core.util.AntPathMatchers;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,43 +38,58 @@ public class AccessMatchingRole {
 	 * @return
 	 */
 	public Collection<ConfigAttribute> needConfigAttributes(String url, Method method) {
-		List<AccessRole> roleList = accessControlService.getAccessRole();
+		Collection<ConfigAttribute> attributes = new ArrayList<ConfigAttribute>();
 
-		if (roleList == null) return null;
+		AccessRole accessRole = this.needRole(url, method);
+		AccessPermissionRole accessPermissionRole = this.needPermissionRole(url, method);
 
-		for(AccessRole role : roleList) {
-			List<MehtodAttribute> methods = role.getMethod();
+		List<String> roleNames = new ArrayList<>();
+		if (accessRole != null) roleNames.addAll(accessRole.getRoleName());
+		if (accessPermissionRole != null) roleNames.add(accessPermissionRole.getRoleName());
+
+		for(String roleName : roleNames) {
+			attributes.add(new SecurityConfig(roleName));
+		}
+
+		return attributes;
+	}
+
+	public AccessRole needRole(String url, Method method) {
+		List<AccessRole> accessRoleList = accessControlService.getAccessRoleList();
+
+		if (accessRoleList == null) return null;
+
+		for(AccessRole accessRole : accessRoleList) {
+			List<Method> methods = accessRole.getMethod();
 
 			if (methods != null) {
 				if (methods.indexOf(method) == -1) continue;
 			}
 
-			String pattern = role.getPattern();
-			if (antPathMatchers.matches(pattern, url)) {
-				Collection<ConfigAttribute> roleName = role.getRoleName();
-				return (roleName == null) ? null : roleName;
+			List<String> patterns = accessRole.getPattern();
+			if (antPathMatchers.matches(patterns, url)) {
+				return accessRole;
 			}
 		}
 
 		return null;
 	}
 
-	public AccessRole needRole(String url, Method method) {
-		List<AccessRole> roleList = accessControlService.getAccessRole();
+	public AccessPermissionRole needPermissionRole(String url, Method method) {
+		List<AccessPermissionRole> accessPermissionRoleList = accessControlService.getAccessPermissionRoleList();
 
-		if (roleList == null) return null;
+		if (accessPermissionRoleList == null) return null;
 
-		for(AccessRole role : roleList) {
-			List<MehtodAttribute> methods = role.getMethod();
-			if (!role.isPermissionRole()) continue;
+		for(AccessPermissionRole accessPermissionRole : accessPermissionRoleList) {
+			List<Method> methods = accessPermissionRole.getMethod();
 
 			if (methods != null) {
 				if (methods.indexOf(method) == -1) continue;
 			}
 
-			String pattern = role.getPattern();
-			if (antPathMatchers.matches(pattern, url)) {
-				return role;
+			List<String> patterns = accessPermissionRole.getPattern();
+			if (antPathMatchers.matches(patterns, url)) {
+				return accessPermissionRole;
 			}
 		}
 
