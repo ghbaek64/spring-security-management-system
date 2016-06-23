@@ -1,5 +1,6 @@
 package org.mei.core.security.authorization;
 
+import org.mei.core.security.enums.Permission;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
@@ -14,9 +15,9 @@ public class Authority implements GrantedAuthority {
 	private static final long serialVersionUID = -7125481982234132933L;
 
 	private final String roleName;
-	private final List<Privilege> privilege;
+	private final List<Permission> privilege;
 
-	public Authority(String roleName, List<Privilege> privilege) {
+	public Authority(String roleName, List<Permission> privilege) {
 		this.roleName = roleName;
 		this.privilege = privilege;
 	}
@@ -26,7 +27,7 @@ public class Authority implements GrantedAuthority {
 		return roleName;
 	}
 
-	public List<Privilege> getPrivilege() {
+	public List<Permission> getPrivilege() {
 		return privilege;
 	}
 

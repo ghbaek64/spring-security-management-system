@@ -283,7 +283,7 @@ public class SecurityContext {
 					.addFilter(usernamePasswordAuthenticationFilter)
 					.addFilter(filterSecurityInterceptor)
 					.csrf().disable()
-					.authorizeRequests().antMatchers();
+					.authorizeRequests();
 		}
 	}
 

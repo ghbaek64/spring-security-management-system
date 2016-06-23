@@ -48,22 +48,18 @@ public class AccessRoleBased implements AccessDecisionManager {
 		String path = request.getServletPath();
 		Method method = Method.valueOf(request.getMethod());
 
-		if (authentication == null)
-			throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
-
-		AccessRole needRole = accessMatchingRole.needRole(path, method);
-
-
-
+		if (authentication == null) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
 
 		consumerAuthenticationResolver = new ConsumerAuthenticationResolver(authentication);
 		List<String> hasAuthorities = consumerAuthenticationResolver.getHasAuthorities();
 
+		AccessRole needRole = accessMatchingRole.needRole(path, method);
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("request path: " + path);
 			logger.debug("request method: " + method);
-			logger.debug("need configAttributes: " + needConfigAttributes);
-			logger.debug("need role: " + needRole);
+			logger.debug("need configAttributes: " + configAttributes);
+			logger.debug("need AccessRole: " + needRole);
 			logger.debug("has Authorities: " + hasAuthorities);
 		}
 
@@ -74,16 +70,15 @@ public class AccessRoleBased implements AccessDecisionManager {
 		} else {
 
 			boolean isAllow = needRole.isAllow();
-			List<ConfigAttribute> roleNames = needRole.getRoleName();
+			List<String> roleNames = needRole.getRoleName();
 
 			if (isAllow && roleNames.size() == 0) { // 모두 허용
 				error = false;
 			} else if (!isAllow && roleNames.size() == 0) { // 모두 차단
 				error = true;
 			} else {
-				for (ConfigAttribute attribute : roleNames) {
-					// 권한이 있는 경우
-					if (hasAuthorities.indexOf(attribute.getAttribute()) > -1) {
+				for (String roleName : roleNames) {
+					if (hasAuthorities.indexOf(roleName) > -1) {
 						error = !isAllow;
 						break;
 					}
@@ -91,12 +86,10 @@ public class AccessRoleBased implements AccessDecisionManager {
 			}
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Access is allow check: " + error);
-		}
-
 		if (error) {
-			// ROLE_ANONYMOUS 인 경우
+			if (logger.isDebugEnabled()) {
+				logger.debug("권한이 없어 접근할 수 없습니다.");
+			}
 			if (authenticationTrustResolver.isAnonymous(authentication)) {
 				throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
 			} else {
@@ -104,28 +97,34 @@ public class AccessRoleBased implements AccessDecisionManager {
 			}
 		}
 
-		if (hasAuthorities.indexOf(Role.ROLE_ADMIN) > -1 || hasAuthorities.indexOf(Role.ROLE_MANAGER) > -1) {
+		if (hasAuthorities.indexOf(Role.ROLE_ADMIN.name()) > -1 || hasAuthorities.indexOf(Role.ROLE_MANAGER.name()) > -1) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("관리자 권한을 가지고 있어 접근을 허가합니다.");
+			}
 			return;
 		}
 
-		// 퍼미션 체크
-		for (ConfigAttribute configAttribute : needRole.getRoleName()) {
-			String roleName = configAttribute.getAttribute();
-			Permission permission = accessMatchingRole.needPermission(roleName, path, Method.valueOf(method));
+		AccessPermissionRole needPermissionRole = accessMatchingRole.needPermissionRole(path, method);
+		Permission needPermission = accessMatchingRole.needPermission(path, method, needPermissionRole);
 
-			if (permission == null) continue;
-			if (permission == Permission.NONE) continue;
-
-			List<Permission> hasPermissions = consumerAuthenticationResolver.getHasPermissions(roleName);
+		if (needPermission == null || needPermission == Permission.NONE) {
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("need permission: " + permission);
-				logger.debug("has permission: " + hasPermissions);
+				logger.debug("need permission none");
 			}
 
-			if (hasPermissions.indexOf(Permission.NONE) > -1 || hasPermissions.indexOf(permission) == -1) {
-				throw new AccessDeniedException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
-			}
+			return;
+		}
+
+		List<Permission> hasPermissions = consumerAuthenticationResolver.getHasPermissions(needPermissionRole.getRoleName());
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("need permission: " + needPermission);
+			logger.debug("has permission: " + hasPermissions);
+		}
+
+		if (hasPermissions.indexOf(Permission.NONE) > -1 || hasPermissions.indexOf(needPermission) == -1) {
+			throw new AccessDeniedException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
 		}
 	}
 

@@ -45,15 +45,7 @@ public class ConsumerAuthenticationResolver {
 
 	public List<Permission> getHasPermissions(String roleName) {
 		for (Authority authority : hasAuthorities) {
-			if (authority.getAuthority().equals(roleName)) {
-				List<Privilege> privileges = authority.getPrivilege();
-				List<Permission> permissions = new ArrayList<>(privileges.size());
-				for (Privilege privilege : privileges) {
-					permissions.add(privilege.getPrivilege());
-				}
-
-				return permissions;
-			}
+			if (authority.getAuthority().equals(roleName)) return authority.getPrivilege();
 		}
 
 		return Collections.emptyList();

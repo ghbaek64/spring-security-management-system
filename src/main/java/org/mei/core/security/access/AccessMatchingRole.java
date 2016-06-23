@@ -96,57 +96,31 @@ public class AccessMatchingRole {
 		return null;
 	}
 
-	/**
-	 * role의 퍼미션을 조회하고 request 정보와 일치하는 퍼미션을 순차적으로 한개만 찾아 리턴하고 종료한다.
-	 *
-	 * @param roleName Collection<ConfigAttribute> configAttributes
-	 * @param url      Ant-Style pattern
-	 * @param method   Method
-	 * @return Permission
-	 */
-	public Permission needPermission(String roleName, String url, Method method) {
-		AccessPermissionRole accessPermissionRole = accessControlService.getAccessPermissionRole(roleName);
+	public Permission needPermission(String url, Method method) {
+		return needPermission(url, method, null);
+	}
+
+	public Permission needPermission(String url, Method method, AccessPermissionRole accessPermissionRole) {
+		if (accessPermissionRole == null) accessPermissionRole = needPermissionRole(url, method);
+
 		if (accessPermissionRole == null) return null;
 
 		List<AccessPermission> accessPermissionList = accessPermissionRole.getAccessPermission();
 		if (accessPermissionList == null) return null;
 
 		for(AccessPermission accessPermission : accessPermissionList) {
-			List<MehtodAttribute> methods = accessPermission.getMethod();
+			List<Method> methods = accessPermission.getMethod();
 
 			if (methods != null) {
 				if (methods.indexOf(method) == -1) continue;
 			}
 
-			String pattern = accessPermission.getPattern();
-			if (antPathMatchers.matches(pattern, url)) {
+			List<String> patterns = accessPermission.getPattern();
+			if (antPathMatchers.matches(patterns, url)) {
 				return accessPermission.getPermission();
 			}
 		}
 
 		return null;
 	}
-
-	/**
-	 * 다수의 role의 퍼미션을 모두 조회한다.
-	 *
-	 * @param configAttributes roleName
-	 * @param url              Ant-Style pattern
-	 * @param method           Method
-	 * @return List<Permission>
-	 */
-	public List<Permission> needPermissions(Collection<ConfigAttribute> configAttributes, String url, Method method) {
-
-		if (configAttributes == null) return null;
-
-		List<Permission> permissionList = new ArrayList<>();
-
-		for(ConfigAttribute configAttribute : configAttributes) {
-			Permission permission = needPermission(configAttribute.getAttribute(), url, method);
-			if (permission != null) permissionList.add(permission);
-		}
-		if (permissionList.size() == 0) return null;
-		return permissionList;
-	}
-
 }

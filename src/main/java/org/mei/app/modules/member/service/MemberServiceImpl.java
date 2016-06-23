@@ -2,6 +2,7 @@ package org.mei.app.modules.member.service;
 
 import org.mei.app.modules.member.dao.MemberDAO;
 import org.mei.app.modules.member.domain.Member;
+import org.mei.core.common.object.Collecting;
 import org.mei.core.security.authorization.Authority;
 import org.mei.core.security.authorization.Consumer;
 import org.mei.core.security.authorization.Privilege;
@@ -39,13 +40,15 @@ public class MemberServiceImpl implements ConsumerService, MemberService {
 
 		Boolean accountNonLocked = member.isAccountBlock();
 
-		List<Authority> authorities = new ArrayList<>();
-		authorities.add(new Authority(member.getRoleName(), null));
-
-		List<Privilege> privileges = new ArrayList<>();
-		privileges.add(new Privilege(Permission.LIST));
-		privileges.add(new Privilege(Permission.WRITE));
-		authorities.add(new Authority("ROLE_PERM_0001", privileges));
+		List<Authority> authorities =
+				Collecting.createList(
+					new Authority(member.getRoleName(), null),
+					new Authority("ROLE_PERM_0001",
+						Collecting.createList(
+							Permission.LIST, Permission.WRITE
+						)
+					)
+				);
 
 		return new Consumer(member.getUserId(), member.getPassword(), !accountNonLocked.booleanValue(), authorities);
 	}
