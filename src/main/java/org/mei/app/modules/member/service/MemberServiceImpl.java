@@ -42,7 +42,6 @@ public class MemberServiceImpl implements ConsumerService, MemberService {
 
 		List<Authority> authorities =
 				Collecting.createList(
-					new Authority(member.getRoleName(), null),
 					new Authority("ROLE_PERM_0001",
 						Collecting.createList(
 							Permission.LIST, Permission.WRITE
@@ -50,6 +49,6 @@ public class MemberServiceImpl implements ConsumerService, MemberService {
 					)
 				);
 
-		return new Consumer(member.getUserId(), member.getPassword(), !accountNonLocked.booleanValue(), authorities);
+		return new Consumer(member.getUserId(), member.getPassword(), !accountNonLocked.booleanValue(), authorities, member.getRoleName());
 	}
 }

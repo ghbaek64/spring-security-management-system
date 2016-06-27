@@ -15,4 +15,5 @@ public interface AccessControlService {
 	List<AccessRole> getAccessRoleList();
 	List<AccessPermissionRole> getAccessPermissionRoleList();
 	Map<String, BasicPermission> getBasicPermissionObject();
+	BasicPermission getBasicPermissionObject(String roleName);
 }

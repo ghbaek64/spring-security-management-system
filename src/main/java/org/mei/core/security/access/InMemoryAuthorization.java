@@ -52,4 +52,10 @@ public class InMemoryAuthorization implements AccessControlService {
 	public Map<String, BasicPermission> getBasicPermissionObject() {
 		return basicPermission;
 	}
+
+	@Override
+	public BasicPermission getBasicPermissionObject(String roleName) {
+		if (basicPermission == null) return null;
+		return basicPermission.get(roleName);
+	}
 }

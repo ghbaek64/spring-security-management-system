@@ -17,24 +17,37 @@ import java.util.Collection;
  */
 public class Consumer implements UserDetails, CredentialsContainer {
 	private User user;
+	/**
+	 * 사용자 권한 1개.
+	 */
+	private String authority;
 
 	public Consumer(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-		this(username, password, true, true, true, true, authorities);
+		this(username, password, true, true, true, true, authorities, null);
 	}
 
-	public Consumer(String username, String password, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-		this(username, password, true, true, true, accountNonLocked, authorities);
+	public Consumer(String username, String password, Collection<? extends GrantedAuthority> authorities, String authority) {
+		this(username, password, true, true, true, true, authorities, authority);
+	}
+
+	public Consumer(String username, String password, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, String authority) {
+		this(username, password, true, true, true, accountNonLocked, authorities, authority);
 	}
 
 	public Consumer(String username, String password, boolean enabled,
 						  boolean accountNonExpired, boolean credentialsNonExpired,
-						  boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+						  boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, String authority) {
 
 		if (((username == null) || "".equals(username)) || (password == null)) {
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
 		}
 
 		this.user = new User(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+		this.authority = authority;
+	}
+
+	public String getAuthority() {
+		return authority;
 	}
 
 	@Override

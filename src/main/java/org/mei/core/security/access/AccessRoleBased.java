@@ -23,8 +23,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 권한 처리 로직
+ * 사용자가 접근한 경로에 대한 권한(Role, Permission)을 확인하고 접근 허가여부를 판단한다.
  * @see AccessDecisionManager
+ *
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
@@ -50,6 +51,9 @@ public class AccessRoleBased implements AccessDecisionManager {
 
 		if (authentication == null) throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("authentication: " + authentication);
+		}
 		consumerAuthenticationResolver = new ConsumerAuthenticationResolver(authentication);
 		List<String> hasAuthorities = consumerAuthenticationResolver.getHasAuthorities();
 
@@ -96,14 +100,14 @@ public class AccessRoleBased implements AccessDecisionManager {
 				throw new AccessDeniedException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
 			}
 		}
-
+/*
 		if (hasAuthorities.indexOf(Role.ROLE_ADMIN.name()) > -1 || hasAuthorities.indexOf(Role.ROLE_MANAGER.name()) > -1) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("관리자 권한을 가지고 있어 접근을 허가합니다.");
 			}
 			return;
 		}
-
+*/
 		AccessPermissionRole needPermissionRole = accessMatchingRole.needPermissionRole(path, method);
 		Permission needPermission = accessMatchingRole.needPermission(path, method, needPermissionRole);
 
@@ -116,11 +120,15 @@ public class AccessRoleBased implements AccessDecisionManager {
 			return;
 		}
 
-		List<Permission> hasPermissions = consumerAuthenticationResolver.getHasPermissions(needPermissionRole.getRoleName());
+		List<Permission> hasPermissions = accessMatchingRole.hasPermission(consumerAuthenticationResolver.getConsumer(), needPermissionRole.getRoleName());
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("need permission: " + needPermission);
 			logger.debug("has permission: " + hasPermissions);
+		}
+
+		if (hasPermissions.indexOf(Permission.ADMIN) > -1 || hasPermissions.indexOf(Permission.MANAGER) > -1) {
+			return;
 		}
 
 		if (hasPermissions.indexOf(Permission.NONE) > -1 || hasPermissions.indexOf(needPermission) == -1) {
