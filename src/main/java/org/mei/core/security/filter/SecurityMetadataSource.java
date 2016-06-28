@@ -1,6 +1,6 @@
 package org.mei.core.security.filter;
 
-import org.mei.core.security.access.AccessMatchingRole;
+import org.mei.core.security.access.AccessMatchingService;
 import org.mei.core.security.enums.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +18,9 @@ import java.util.Collection;
  */
 public class SecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final AccessMatchingRole accessMatchingRole;
+	private final AccessMatchingService accessMatchingRole;
 
-	public SecurityMetadataSource(AccessMatchingRole accessMatchingRole) {
+	public SecurityMetadataSource(AccessMatchingService accessMatchingRole) {
 		this.accessMatchingRole = accessMatchingRole;
 	}
 

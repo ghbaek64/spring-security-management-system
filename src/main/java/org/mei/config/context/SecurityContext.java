@@ -1,14 +1,14 @@
 package org.mei.config.context;
 
 import org.mei.core.common.object.Collecting;
-import org.mei.core.security.ConsumerAuthenticationProvider;
+import org.mei.core.security.authentication.ConsumerAuthenticationProvider;
 import org.mei.core.security.access.*;
 import org.mei.core.security.enums.Permission;
 import org.mei.core.security.filter.SecurityMetadataSource;
 import org.mei.core.security.handler.*;
 import org.mei.core.security.password.ShaPasswordEncoder;
-import org.mei.core.security.service.ConsumerDetailsService;
-import org.mei.core.security.service.ConsumerService;
+import org.mei.core.security.authentication.ConsumerDetailsService;
+import org.mei.core.security.authentication.ConsumerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,12 +242,12 @@ public class SecurityContext {
 							new AccessPermission(Collecting.createList("/board/write"), null, Permission.WRITE),
 							new AccessPermission(Collecting.createList("/board/delete"), null, Permission.MANAGER))));
 
-			AccessMatchingRole accessMatchingRole = new AccessMatchingRole(inMemoryAuthorization);
+			AccessMatchingService accessMatchingRole = new AccessMatchingService(inMemoryAuthorization);
 
 			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
 			filterSecurityInterceptor.setSecurityMetadataSource(new SecurityMetadataSource(accessMatchingRole));
 			filterSecurityInterceptor.setAuthenticationManager(authenticationManager);
-			filterSecurityInterceptor.setAccessDecisionManager(new AccessRoleBased(accessMatchingRole));
+			filterSecurityInterceptor.setAccessDecisionManager(new AccessDecisionService(accessMatchingRole));
 
 			http
 					.sessionManagement()

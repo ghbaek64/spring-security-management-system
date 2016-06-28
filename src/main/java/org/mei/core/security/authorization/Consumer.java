@@ -20,34 +20,34 @@ public class Consumer implements UserDetails, CredentialsContainer {
 	/**
 	 * 사용자 권한 1개.
 	 */
-	private String authority;
+	private String groupRole;
 
 	public Consumer(String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		this(username, password, true, true, true, true, authorities, null);
 	}
 
-	public Consumer(String username, String password, Collection<? extends GrantedAuthority> authorities, String authority) {
-		this(username, password, true, true, true, true, authorities, authority);
+	public Consumer(String username, String password, Collection<? extends GrantedAuthority> authorities, String groupRole) {
+		this(username, password, true, true, true, true, authorities, groupRole);
 	}
 
-	public Consumer(String username, String password, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, String authority) {
-		this(username, password, true, true, true, accountNonLocked, authorities, authority);
+	public Consumer(String username, String password, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, String groupRole) {
+		this(username, password, true, true, true, accountNonLocked, authorities, groupRole);
 	}
 
 	public Consumer(String username, String password, boolean enabled,
 						  boolean accountNonExpired, boolean credentialsNonExpired,
-						  boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, String authority) {
+						  boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, String groupRole) {
 
 		if (((username == null) || "".equals(username)) || (password == null)) {
 			throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
 		}
 
 		this.user = new User(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-		this.authority = authority;
+		this.groupRole = groupRole;
 	}
 
-	public String getAuthority() {
-		return authority;
+	public String getGroupRole() {
+		return groupRole;
 	}
 
 	@Override

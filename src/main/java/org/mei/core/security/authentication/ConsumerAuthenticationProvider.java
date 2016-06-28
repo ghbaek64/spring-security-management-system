@@ -1,7 +1,6 @@
-package org.mei.core.security;
+package org.mei.core.security.authentication;
 
 import org.mei.core.security.authorization.Consumer;
-import org.mei.core.security.service.ConsumerDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;

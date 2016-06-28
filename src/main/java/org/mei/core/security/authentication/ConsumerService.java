@@ -1,4 +1,4 @@
-package org.mei.core.security.service;
+package org.mei.core.security.authentication;
 
 import org.mei.core.security.authorization.Consumer;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

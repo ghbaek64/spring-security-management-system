@@ -1,10 +1,9 @@
 package org.mei.core.security.access;
 
+import org.mei.core.security.authorization.ConsumerAuthentication;
 import org.mei.core.security.authorization.Authority;
-import org.mei.core.security.authorization.Consumer;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
-import org.mei.core.security.service.AccessControlService;
 import org.mei.core.util.AntPathMatchers;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -18,11 +17,11 @@ import java.util.*;
  * @site http ://syaku.tistory.com
  * @since 16. 6. 13.
  */
-public class AccessMatchingRole {
+public class AccessMatchingService {
 	private AntPathMatchers antPathMatchers = new AntPathMatchers();
 
 	private final AccessControlService accessControlService;
-	public AccessMatchingRole(AccessControlService accessControlService) {
+	public AccessMatchingService(AccessControlService accessControlService) {
 		this.accessControlService = accessControlService;
 	}
 
@@ -125,6 +124,12 @@ public class AccessMatchingRole {
 		return null;
 	}
 
+	/**
+	 * 기본 퍼미션의 데이터를 조회한다.
+	 *
+	 * @param roleName
+	 * @return 기본 퍼미션
+	 */
 	public List<Permission> basicPermission(String roleName) {
 
 		if (roleName == null) return Collections.EMPTY_LIST;
@@ -152,12 +157,12 @@ public class AccessMatchingRole {
 	 * 2번의 퍼미션에 NONE를 가진 경우 1번에서 얻은 퍼미션 모두 초기화 하고 3번으로 넘어간다.
 	 * 3번의 결과를 반환한다.
 	 *
-	 * @param consumer the consumer
-	 * @param roleName the role name
-	 * @return the has permission
+	 * @param consumerAuthentication 사용자 인증된 정보
+	 * @param roleName roleName
+	 * @return 사용자가 가진 퍼미션
 	 */
-	public List<Permission> hasPermission(Consumer consumer, String roleName) {
-		List<Permission> hasPrivilege = basicPermission(consumer.getAuthority());
+	public List<Permission> hasPermission(ConsumerAuthentication consumerAuthentication, String roleName) {
+		List<Permission> hasPrivilege = basicPermission(consumerAuthentication.getGroupRole());
 		if (hasPrivilege.indexOf(Permission.ADMIN) > -1 || hasPrivilege.indexOf(Permission.MANAGER) > -1 || roleName == null) return hasPrivilege;
 
 		List<Permission> basicPermission = basicPermission(roleName);
@@ -171,7 +176,7 @@ public class AccessMatchingRole {
 			}
 		}
 
-		List<Authority> authorities = (List<Authority>) consumer.getAuthorities();
+		List<Authority> authorities = (List<Authority>) consumerAuthentication.getAuthorities();
 		List<Permission> hasPermission = null;
 
 		for(Authority hasAuthority : authorities) {

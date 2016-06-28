@@ -14,10 +14,10 @@
 
 	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 	<beans:bean id="jsonConsumerService" class="org.mei.app.modules.member.service.JsonConsumerService" />
-	<beans:bean id="userDetailsService" class="org.mei.core.security.service.ConsumerDetailsService">
+	<beans:bean id="userDetailsService" class="org.mei.core.security.authentication.ConsumerDetailsService">
 		<beans:constructor-arg name="consumerService" ref="jsonConsumerService" />
 	</beans:bean>
-	<beans:bean id="authenticationProvider" class="org.mei.core.security.ConsumerAuthenticationProvider">
+	<beans:bean id="authenticationProvider" class="org.mei.core.security.authentication.ConsumerAuthenticationProvider">
 		<beans:constructor-arg name="userDetailsService" ref="userDetailsService" />
 		<beans:property name="passwordEncoder" ref="passwordEncoder" />
 	</beans:bean>

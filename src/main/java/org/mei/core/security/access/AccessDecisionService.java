@@ -1,9 +1,8 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.authentication.ConsumerAuthenticationResolver;
+import org.mei.core.security.authorization.ConsumerAuthentication;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
-import org.mei.core.security.enums.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -30,18 +29,18 @@ import java.util.List;
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
  */
-public class AccessRoleBased implements AccessDecisionManager {
+public class AccessDecisionService implements AccessDecisionManager {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final AccessMatchingRole accessMatchingRole;
+	private final AccessMatchingService accessMatchingRole;
 
-	public AccessRoleBased(AccessMatchingRole accessMatchingRole) {
+	public AccessDecisionService(AccessMatchingService accessMatchingRole) {
 		this.accessMatchingRole = accessMatchingRole;
 	}
 
 	private MessageSourceAccessor messageSourceAccessor = SpringSecurityMessageSource.getAccessor();
 	private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
-	private ConsumerAuthenticationResolver consumerAuthenticationResolver;
+	private ConsumerAuthentication consumerAuthentication;
 
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
 		FilterInvocation fi = (FilterInvocation) object;
@@ -54,8 +53,8 @@ public class AccessRoleBased implements AccessDecisionManager {
 		if (logger.isDebugEnabled()) {
 			logger.debug("authentication: " + authentication);
 		}
-		consumerAuthenticationResolver = new ConsumerAuthenticationResolver(authentication);
-		List<String> hasAuthorities = consumerAuthenticationResolver.getHasAuthorities();
+		consumerAuthentication = new ConsumerAuthentication(authentication);
+		List<String> hasAuthorities = consumerAuthentication.getAuthoritiesToString();
 
 		AccessRole needRole = accessMatchingRole.needRole(path, method);
 
@@ -120,7 +119,7 @@ public class AccessRoleBased implements AccessDecisionManager {
 			return;
 		}
 
-		List<Permission> hasPermissions = accessMatchingRole.hasPermission(consumerAuthenticationResolver.getConsumer(), needPermissionRole.getRoleName());
+		List<Permission> hasPermissions = accessMatchingRole.hasPermission(consumerAuthentication, needPermissionRole.getRoleName());
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("need permission: " + needPermission);

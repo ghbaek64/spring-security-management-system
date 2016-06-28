@@ -1,7 +1,5 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.service.AccessControlService;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
