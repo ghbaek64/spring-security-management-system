@@ -17,6 +17,10 @@ public final class Collecting {
 		return iterable == null ? Collections.<T>emptyList() : iterable;
 	}
 
+	public static <T> List<T> forEmpty(List<T> list) {
+		return list == null ? new ArrayList<T>() : list;
+	}
+
 	public static boolean isEmpty(Collection<?> lol) {
 		return (lol == null || lol.isEmpty());
 	}

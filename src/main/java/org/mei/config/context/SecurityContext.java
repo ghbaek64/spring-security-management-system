@@ -232,8 +232,9 @@ public class SecurityContext {
 			inMemoryAuthorization
 					.add(new BasicPermission("ROLE_ADMIN", Collecting.createList(Permission.ADMIN)))
 
-					.add(new AccessRole(Collecting.createList("/member/login"), null, true, Collections.EMPTY_LIST))
+					.add(new AccessRole(Collecting.createList("/member/login"), null, true, null))
 					.add(new AccessRole(Collecting.createList("/member/mypage"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
+					.add(new AccessRole(Collecting.createList("/member/visitor"), null, true, Collecting.createList("ROLE_ADMIN")))
 					.add(new AccessRole(Collecting.createList("/**"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
 
 					.add(new AccessPermissionRole("ROLE_PERM_0001", Collecting.createList("/board/**"), null, Collecting.createList(

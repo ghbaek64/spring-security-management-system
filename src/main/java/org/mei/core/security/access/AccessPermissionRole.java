@@ -40,7 +40,7 @@ public class AccessPermissionRole {
 
 	@Override
 	public String toString() {
-		return "AccessPermissionRole{" +
+		return super.toString() + '{' +
 				"roleName='" + roleName + '\'' +
 				", pattern=" + pattern +
 				", method=" + method +

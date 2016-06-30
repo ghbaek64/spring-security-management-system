@@ -43,7 +43,7 @@ public class AccessRole {
 
 	@Override
 	public String toString() {
-		return "AccessRole{" +
+		return super.toString() + '{' +
 				"pattern=" + pattern +
 				", method=" + method +
 				", roleName=" + roleName +

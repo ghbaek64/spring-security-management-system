@@ -33,7 +33,7 @@ public class Authority implements GrantedAuthority {
 
 	@Override
 	public String toString() {
-		return "Role{" +
+		return super.toString() + '{' +
 				"roleName='" + roleName + '\'' +
 				", privilege=" + privilege +
 				'}';

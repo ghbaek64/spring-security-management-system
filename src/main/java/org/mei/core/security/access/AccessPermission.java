@@ -36,7 +36,7 @@ public class AccessPermission {
 
 	@Override
 	public String toString() {
-		return "AccessPermission{" +
+		return super.toString() + '{' +
 				"pattern=" + pattern +
 				", method=" + method +
 				", permission=" + permission +

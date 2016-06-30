@@ -68,6 +68,6 @@ public class ConsumerAuthentication {
 			if (authority.getAuthority().equals(roleName)) return authority.getPrivilege();
 		}
 
-		return Collections.emptyList();
+		return null;
 	}
 }

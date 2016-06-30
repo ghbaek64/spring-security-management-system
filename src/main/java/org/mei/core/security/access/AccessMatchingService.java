@@ -5,6 +5,8 @@ import org.mei.core.security.authorization.Authority;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
 import org.mei.core.util.AntPathMatchers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 
@@ -18,6 +20,7 @@ import java.util.*;
  * @since 16. 6. 13.
  */
 public class AccessMatchingService {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private AntPathMatchers antPathMatchers = new AntPathMatchers();
 
 	private final AccessControlService accessControlService;
@@ -132,18 +135,14 @@ public class AccessMatchingService {
 	 */
 	public List<Permission> basicPermission(String roleName) {
 
-		if (roleName == null) return Collections.EMPTY_LIST;
+		if (roleName == null) return null;
 
 		Map<String, BasicPermission> basicPermissionMap = accessControlService.getBasicPermissionObject();
 		BasicPermission basicPermission = basicPermissionMap.get(roleName);
 
-		if (basicPermission == null) return Collections.EMPTY_LIST;
+		if (basicPermission == null) return null;
 
-		List<Permission> permissionList = basicPermission.getPermission();
-
-		if (permissionList == null) return Collections.EMPTY_LIST;
-
-		return permissionList;
+		return basicPermission.getPermission();
 	}
 
 	/**
@@ -163,16 +162,21 @@ public class AccessMatchingService {
 	 */
 	public List<Permission> hasPermission(ConsumerAuthentication consumerAuthentication, String roleName) {
 		List<Permission> hasPrivilege = basicPermission(consumerAuthentication.getGroupRole());
+
+		if (hasPrivilege == null) hasPrivilege = new ArrayList<>();
+
 		if (hasPrivilege.indexOf(Permission.ADMIN) > -1 || hasPrivilege.indexOf(Permission.MANAGER) > -1 || roleName == null) return hasPrivilege;
 
 		List<Permission> basicPermission = basicPermission(roleName);
 
-		if (basicPermission.indexOf(Permission.NONE) > -1) {
-			hasPrivilege.clear();
-		} else {
-			if (basicPermission.indexOf(Permission.ADMIN) > -1 || basicPermission.indexOf(Permission.MANAGER) > -1) return basicPermission;
-			for(Permission permission : basicPermission) {
-				if (hasPrivilege.indexOf(permission) == -1) hasPrivilege.add(permission);
+		if (basicPermission != null) {
+			if (basicPermission.indexOf(Permission.NONE) > -1) {
+				hasPrivilege.clear();
+			} else {
+				if (basicPermission.indexOf(Permission.ADMIN) > -1 || basicPermission.indexOf(Permission.MANAGER) > -1) return basicPermission;
+				for(Permission permission : basicPermission) {
+					if (hasPrivilege.indexOf(permission) == -1) hasPrivilege.add(permission);
+				}
 			}
 		}
 

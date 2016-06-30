@@ -29,7 +29,7 @@ public class BasicPermission {
 
 	@Override
 	public String toString() {
-		return "BasicPermission{" +
+		return super.toString() + '{' +
 				"roleName='" + roleName + '\'' +
 				", permission=" + permission +
 				'}';

@@ -63,7 +63,7 @@ public class AccessDecisionService implements AccessDecisionManager {
 			logger.debug("request method: " + method);
 			logger.debug("need configAttributes: " + configAttributes);
 			logger.debug("need AccessRole: " + needRole);
-			logger.debug("has Authorities: " + hasAuthorities);
+			logger.debug("has Authorities: " + consumerAuthentication.getAuthorities());
 		}
 
 		boolean error = true;
@@ -110,6 +110,11 @@ public class AccessDecisionService implements AccessDecisionManager {
 		AccessPermissionRole needPermissionRole = accessMatchingRole.needPermissionRole(path, method);
 		Permission needPermission = accessMatchingRole.needPermission(path, method, needPermissionRole);
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("need permission role: " + needPermissionRole);
+			logger.debug("need permission: " + needPermission);
+		}
+
 		if (needPermission == null || needPermission == Permission.NONE) {
 
 			if (logger.isDebugEnabled()) {
@@ -122,7 +127,6 @@ public class AccessDecisionService implements AccessDecisionManager {
 		List<Permission> hasPermissions = accessMatchingRole.hasPermission(consumerAuthentication, needPermissionRole.getRoleName());
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("need permission: " + needPermission);
 			logger.debug("has permission: " + hasPermissions);
 		}
 
