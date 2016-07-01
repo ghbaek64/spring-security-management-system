@@ -1,6 +1,9 @@
 package org.mei.core.security.authentication;
 
+import org.mei.core.security.access.AccessControlService;
+import org.mei.core.security.authorization.Authority;
 import org.mei.core.security.authorization.Consumer;
+import org.mei.core.security.authorization.ConsumerPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -15,6 +18,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
@@ -23,12 +29,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ConsumerAuthenticationProvider implements AuthenticationProvider {
 	private static final Logger logger = LoggerFactory.getLogger(ConsumerAuthenticationProvider.class);
 
-	private final ConsumerDetailsService consumerDetailsService;
+	private final UserDetailsServiceImpl userDetailsService;
+	private final AccessControlService accessControlService;
 	private PasswordEncoder passwordEncoder = NoOpPasswordEncoder.getInstance();
 	private MessageSourceAccessor messageSourceAccessor = SpringSecurityMessageSource.getAccessor();
 
-	public ConsumerAuthenticationProvider(ConsumerDetailsService consumerDetailsService) {
-		this.consumerDetailsService = consumerDetailsService;
+	public ConsumerAuthenticationProvider(UserDetailsServiceImpl userDetailsService, AccessControlService accessControlService) {
+		this.userDetailsService = userDetailsService;
+		this.accessControlService = accessControlService;
 	}
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
@@ -45,7 +53,7 @@ public class ConsumerAuthenticationProvider implements AuthenticationProvider {
 		String username = authentication.getName();
 		String password = (String) authentication.getCredentials();
 
-		Consumer consumer = consumerDetailsService.loadUserByUsername(username);
+		Consumer consumer = userDetailsService.loadUserByUsername(username);
 
 		if (consumer == null) {
 			throw new UsernameNotFoundException(messageSourceAccessor.getMessage("DigestAuthenticationFilter.usernameNotFound", new String[]{ username }));
@@ -68,7 +76,18 @@ public class ConsumerAuthenticationProvider implements AuthenticationProvider {
 			throw new LockedException(messageSourceAccessor.getMessage("AbstractUserDetailsAuthenticationProvider.locked"));
 		}
 
-		Authentication auth = new UsernamePasswordAuthenticationToken(consumer, passwordEncoder.encode(password), consumer.getAuthorities());
+
+		List<ConsumerPermission> consumerPermissionList = accessControlService.getConsumerPermissionObject(username);
+
+		List<Authority> authorities = new ArrayList<>();
+
+		if (consumerPermissionList != null) {
+			for(ConsumerPermission consumerPermission : consumerPermissionList) {
+				authorities.add(new Authority(consumerPermission.getRoleName(), consumerPermission.getPermissions()));
+			}
+		}
+
+		Authentication auth = new UsernamePasswordAuthenticationToken(consumer, passwordEncoder.encode(password), authorities);
 		return auth;
 	}
 

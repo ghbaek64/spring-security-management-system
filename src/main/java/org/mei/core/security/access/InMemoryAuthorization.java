@@ -1,5 +1,8 @@
 package org.mei.core.security.access;
 
+import org.mei.core.common.object.Collecting;
+import org.mei.core.security.authorization.ConsumerPermission;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,11 +17,13 @@ public class InMemoryAuthorization implements AccessControlService {
 	private static final Map<String, BasicPermission> basicPermission;
 	private static final List<AccessRole> accessRole;
 	private static final List<AccessPermissionRole> accessPermissionRole;
+	private static final Map<String, List<ConsumerPermission>> consumerPermission;
 
 	static {
 		basicPermission = new HashMap<>();
 		accessRole = new ArrayList<>();
 		accessPermissionRole = new ArrayList<>();
+		consumerPermission = new HashMap<>();
 	}
 
 	public InMemoryAuthorization add(BasicPermission permission) {
@@ -33,6 +38,18 @@ public class InMemoryAuthorization implements AccessControlService {
 
 	public InMemoryAuthorization add(AccessPermissionRole role) {
 		accessPermissionRole.add(role);
+		return this;
+	}
+
+	public InMemoryAuthorization add(ConsumerPermission consumer) {
+		String username = consumer.getUsername();
+
+		if (consumerPermission.containsKey(username)) {
+			consumerPermission.get(username).add(consumer);
+		} else {
+			consumerPermission.put(username, Collecting.createList(consumer));
+		}
+
 		return this;
 	}
 
@@ -55,5 +72,16 @@ public class InMemoryAuthorization implements AccessControlService {
 	public BasicPermission getBasicPermissionObject(String roleName) {
 		if (basicPermission == null) return null;
 		return basicPermission.get(roleName);
+	}
+
+	@Override
+	public Map<String, List<ConsumerPermission>> getConsumerPermissionObject() {
+		return consumerPermission;
+	}
+
+	@Override
+	public List<ConsumerPermission> getConsumerPermissionObject(String username) {
+		if (consumerPermission == null) return null;
+		return consumerPermission.get(username);
 	}
 }

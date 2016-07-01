@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * 인증(로그인) 후 얻는 사용자 정보(User) 정보
@@ -22,16 +23,16 @@ public class Consumer implements UserDetails, CredentialsContainer {
 	 */
 	private String groupRole;
 
-	public Consumer(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-		this(username, password, true, true, true, true, authorities, null);
+	public Consumer(String username, String password) {
+		this(username, password, true, true, true, true, Collections.EMPTY_LIST, null);
 	}
 
-	public Consumer(String username, String password, Collection<? extends GrantedAuthority> authorities, String groupRole) {
-		this(username, password, true, true, true, true, authorities, groupRole);
+	public Consumer(String username, String password, String groupRole) {
+		this(username, password, true, true, true, true, Collections.EMPTY_LIST, groupRole);
 	}
 
-	public Consumer(String username, String password, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, String groupRole) {
-		this(username, password, true, true, true, accountNonLocked, authorities, groupRole);
+	public Consumer(String username, String password, boolean accountNonLocked, String groupRole) {
+		this(username, password, true, true, true, accountNonLocked, Collections.EMPTY_LIST, groupRole);
 	}
 
 	public Consumer(String username, String password, boolean enabled,

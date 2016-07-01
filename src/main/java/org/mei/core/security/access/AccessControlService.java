@@ -1,5 +1,7 @@
 package org.mei.core.security.access;
 
+import org.mei.core.security.authorization.ConsumerPermission;
+
 import java.util.List;
 import java.util.Map;
 
@@ -38,4 +40,19 @@ public interface AccessControlService {
 	 * @return
 	 */
 	BasicPermission getBasicPermissionObject(String roleName);
+
+	/**
+	 * 모든 사용자에 부여된 권한을 조회한다.
+	 *
+	 * @return
+	 */
+	Map<String, List<ConsumerPermission>> getConsumerPermissionObject();
+
+	/**
+	 * 사용자에 부여된 권한을 조회한다.
+	 *
+	 * @param username 사용자 아이디
+	 * @return
+	 */
+	List<ConsumerPermission> getConsumerPermissionObject(String username);
 }

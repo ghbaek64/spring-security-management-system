@@ -1,6 +1,6 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.authorization.ConsumerAuthentication;
+import org.mei.core.security.authorization.ConsumerManager;
 import org.mei.core.security.authorization.Authority;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
@@ -160,7 +160,7 @@ public class AccessMatchingService {
 	 * @param roleName roleName
 	 * @return 사용자가 가진 퍼미션
 	 */
-	public List<Permission> hasPermission(ConsumerAuthentication consumerAuthentication, String roleName) {
+	public List<Permission> hasPermission(ConsumerManager consumerAuthentication, String roleName) {
 		List<Permission> hasPrivilege = basicPermission(consumerAuthentication.getGroupRole());
 
 		if (hasPrivilege == null) hasPrivilege = new ArrayList<>();

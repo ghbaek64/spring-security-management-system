@@ -1,14 +1,15 @@
 package org.mei.config.context;
 
 import org.mei.core.common.object.Collecting;
-import org.mei.core.security.authentication.ConsumerAuthenticationProvider;
 import org.mei.core.security.access.*;
+import org.mei.core.security.authentication.ConsumerAuthenticationProvider;
+import org.mei.core.security.authentication.ConsumerDetailsService;
+import org.mei.core.security.authentication.UserDetailsServiceImpl;
+import org.mei.core.security.authorization.ConsumerPermission;
 import org.mei.core.security.enums.Permission;
 import org.mei.core.security.filter.SecurityMetadataSource;
 import org.mei.core.security.handler.*;
 import org.mei.core.security.password.ShaPasswordEncoder;
-import org.mei.core.security.authentication.ConsumerDetailsService;
-import org.mei.core.security.authentication.ConsumerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import org.springframework.security.web.authentication.session.*;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,12 +50,14 @@ import java.util.Properties;
 public class SecurityContext {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityContext.class);
 
-	@Autowired Properties mei;
+	@Autowired private Properties mei;
 
-	@Resource(name= "memberService") private ConsumerService consumerService;
+	@Autowired
+	private ConsumerDetailsService consumerDetailsService;
 
 	private PasswordEncoder passwordEncoder;
 	private UserDetailsService userDetailsService;
+	private InMemoryAuthorization inMemoryAuthorization;
 
 	@Bean
 	public SessionRegistry sessionRegistry() {
@@ -71,6 +72,11 @@ public class SecurityContext {
 	@Bean
 	public UserDetailsService userDetailsService() {
 		return userDetailsService;
+	}
+
+	@Bean
+	public AccessControlService getAccessControlService() {
+		return inMemoryAuthorization;
 	}
 
 	/**
@@ -101,13 +107,35 @@ public class SecurityContext {
 				.withUser("user").password("1234").roles("USER")
 				.and().withUser("admin").password("1234").roles("ADMIN", "USER");
 		 */
+
+		inMemoryAuthorization = new InMemoryAuthorization();
+
+		// 기본 권한 설정
+		inMemoryAuthorization
+				.add(new ConsumerPermission("admin", "ROLE_PERM_0001", Collecting.createList(Permission.ADMIN)))
+				.add(new ConsumerPermission("test", "ROLE_PERM_0001", Collecting.createList(Permission.LIST, Permission.WRITE)))
+
+				.add(new BasicPermission("ROLE_ADMIN", Collecting.createList(Permission.ADMIN)))
+
+				.add(new AccessRole(Collecting.createList("/member/login"), null, true, null))
+				.add(new AccessRole(Collecting.createList("/member/mypage"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
+				.add(new AccessRole(Collecting.createList("/member/visitor"), null, true, Collecting.createList("ROLE_ADMIN")))
+				.add(new AccessRole(Collecting.createList("/**"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
+
+				.add(new AccessPermissionRole("ROLE_PERM_0001", Collecting.createList("/board/**"), null, Collecting.createList(
+						new AccessPermission(Collecting.createList("/board"), null, Permission.LIST),
+						new AccessPermission(Collecting.createList("/board/view"), null, Permission.VIEW),
+						new AccessPermission(Collecting.createList("/board/write"), null, Permission.WRITE),
+						new AccessPermission(Collecting.createList("/board/delete"), null, Permission.MANAGER))));
+
+
 		passwordEncoder = getPasswordEncoder();
 		//UserDetailsService userDetailsService = new ConsumerDetailsService(new JsonConsumerService());
-		ConsumerDetailsService consumerDetailsService = new ConsumerDetailsService(consumerService);
+		UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(consumerDetailsService);
 
-		this.userDetailsService = consumerDetailsService;
+		this.userDetailsService = userDetailsService;
 
-		ConsumerAuthenticationProvider consumerAuthenticationProvider = new ConsumerAuthenticationProvider(consumerDetailsService);
+		ConsumerAuthenticationProvider consumerAuthenticationProvider = new ConsumerAuthenticationProvider(userDetailsService, inMemoryAuthorization);
 		consumerAuthenticationProvider.setPasswordEncoder(passwordEncoder);
 
 		auth.authenticationProvider(consumerAuthenticationProvider);
@@ -121,6 +149,7 @@ public class SecurityContext {
 		@Autowired SessionRegistry sessionRegistry;
 		@Autowired PasswordEncoder passwordEncoder;
 		@Autowired UserDetailsService userDetailsService;
+		@Autowired AccessControlService accessControlService;
 
 		private AuthenticationManager authenticationManager;
 
@@ -223,27 +252,9 @@ public class SecurityContext {
 			rememberMeServices.setCookieName("mei_remember_me");
 			rememberMeServices.setParameter("remember_me");
 			rememberMeServices.setTokenValiditySeconds(60 * 60 * 24 * 31); // 1 month
-			// Remember ME Service
+			// Remember ME Service))));
 
-
-			InMemoryAuthorization inMemoryAuthorization = new InMemoryAuthorization();
-
-			// 기본 권한 설정
-			inMemoryAuthorization
-					.add(new BasicPermission("ROLE_ADMIN", Collecting.createList(Permission.ADMIN)))
-
-					.add(new AccessRole(Collecting.createList("/member/login"), null, true, null))
-					.add(new AccessRole(Collecting.createList("/member/mypage"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
-					.add(new AccessRole(Collecting.createList("/member/visitor"), null, true, Collecting.createList("ROLE_ADMIN")))
-					.add(new AccessRole(Collecting.createList("/**"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
-
-					.add(new AccessPermissionRole("ROLE_PERM_0001", Collecting.createList("/board/**"), null, Collecting.createList(
-							new AccessPermission(Collecting.createList("/board"), null, Permission.LIST),
-							new AccessPermission(Collecting.createList("/board/view"), null, Permission.VIEW),
-							new AccessPermission(Collecting.createList("/board/write"), null, Permission.WRITE),
-							new AccessPermission(Collecting.createList("/board/delete"), null, Permission.MANAGER))));
-
-			AccessMatchingService accessMatchingRole = new AccessMatchingService(inMemoryAuthorization);
+			AccessMatchingService accessMatchingRole = new AccessMatchingService(accessControlService);
 
 			FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
 			filterSecurityInterceptor.setSecurityMetadataSource(new SecurityMetadataSource(accessMatchingRole));

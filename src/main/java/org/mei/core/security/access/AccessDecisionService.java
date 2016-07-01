@@ -1,6 +1,6 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.authorization.ConsumerAuthentication;
+import org.mei.core.security.authorization.ConsumerManager;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class AccessDecisionService implements AccessDecisionManager {
 	private MessageSourceAccessor messageSourceAccessor = SpringSecurityMessageSource.getAccessor();
 	private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
-	private ConsumerAuthentication consumerAuthentication;
+	private ConsumerManager consumerAuthentication;
 
 	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
 		FilterInvocation fi = (FilterInvocation) object;
@@ -53,7 +53,7 @@ public class AccessDecisionService implements AccessDecisionManager {
 		if (logger.isDebugEnabled()) {
 			logger.debug("authentication: " + authentication);
 		}
-		consumerAuthentication = new ConsumerAuthentication(authentication);
+		consumerAuthentication = new ConsumerManager(authentication);
 		List<String> hasAuthorities = consumerAuthentication.getAuthoritiesToString();
 
 		AccessRole needRole = accessMatchingRole.needRole(path, method);
@@ -94,7 +94,7 @@ public class AccessDecisionService implements AccessDecisionManager {
 				logger.debug("권한이 없어 접근할 수 없습니다.");
 			}
 			if (authenticationTrustResolver.isAnonymous(authentication)) {
-				throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AccountStatusUserDetailsChecker.disabled"));
+				throw new AuthenticationCredentialsNotFoundException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
 			} else {
 				throw new AccessDeniedException(messageSourceAccessor.getMessage("AbstractAccessDecisionManager.accessDenied"));
 			}

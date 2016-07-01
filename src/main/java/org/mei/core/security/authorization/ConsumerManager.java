@@ -13,12 +13,12 @@ import java.util.List;
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
  */
-public class ConsumerAuthentication {
+public class ConsumerManager {
 	private Consumer consumer;
 	private List<Authority> authorities;
 	private String groupRole;
 
-	public ConsumerAuthentication(Authentication authentication) {
+	public ConsumerManager(Authentication authentication) {
 		this.authorities = new ArrayList<>();
 		this.consumer = null;
 		this.groupRole = null;
