@@ -5,6 +5,7 @@ import org.mei.core.security.enums.Method;
 import java.util.List;
 
 /**
+ * 접근 퍼미션을 설정하여 룰을 생성한다.
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 21.

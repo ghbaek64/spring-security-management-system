@@ -6,7 +6,7 @@ import org.springframework.security.access.ConfigAttribute;
 import java.util.List;
 
 /**
- * 접근 경로에 대한 필요한 역활을 설정하여 규칙을 정의한다.
+ * 접근 경로에 대한 필요한 역활을 설정한다.
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 13.

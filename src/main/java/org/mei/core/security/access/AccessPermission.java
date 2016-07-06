@@ -6,7 +6,9 @@ import org.mei.core.security.enums.Permission;
 import java.util.List;
 
 /**
- * 룰과 url에 대한 퍼미션 정보
+ * AccessPermissionRole에 대한 퍼미션 정보
+ *
+ * @see AccessPermissionRole
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
