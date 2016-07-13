@@ -1,12 +1,8 @@
 package org.mei.app.modules.grant.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -14,35 +10,29 @@ import java.io.Serializable;
  * @site http://syaku.tistory.com
  * @since 16. 7. 4.
  */
-
-public class GrantAccess implements Serializable {
+@Entity(name = "GRANT_ACCESS_RULE")
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GrantAccessRule implements Serializable {
 
 	private static final long serialVersionUID = 8935674872273631881L;
 
-	@Column(name = "grant_access_srl")
+	@Column(name = "access_rule_srl")
 	@Id
-	@GeneratedValue(generator = "IdGenerator")
-	@GenericGenerator(
-			name = "IdGenerator",
-			strategy = "org.mei.core.orm.IdGenerator",
-			parameters = {
-					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "MEMBER_IDX_SEQ"),
-					@org.hibernate.annotations.Parameter(name = "prefix", value = "MEM"),
-					@org.hibernate.annotations.Parameter(name = "pad", value = "17")
-			})
-	private long grantAccessSrl;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long accessRuleSrl;
 	private String patterns;
 	private String methods;
+	@Column(name = "role_names")
 	private String roleNames;
 	private String allow;
 	private int seq;
 
-	public long getGrantAccessSrl() {
-		return grantAccessSrl;
+	public long getAccessRuleSrl() {
+		return accessRuleSrl;
 	}
 
-	public void setGrantAccessSrl(long grantAccessSrl) {
-		this.grantAccessSrl = grantAccessSrl;
+	public void setAccessRuleSrl(long accessRuleSrl) {
+		this.accessRuleSrl = accessRuleSrl;
 	}
 
 	public String getPatterns() {
@@ -83,5 +73,17 @@ public class GrantAccess implements Serializable {
 
 	public void setSeq(int seq) {
 		this.seq = seq;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + '{' +
+				"accessRuleSrl=" + accessRuleSrl +
+				", patterns='" + patterns + '\'' +
+				", methods='" + methods + '\'' +
+				", roleNames='" + roleNames + '\'' +
+				", allow='" + allow + '\'' +
+				", seq=" + seq +
+				'}';
 	}
 }

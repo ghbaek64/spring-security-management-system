@@ -1,6 +1,6 @@
 package org.mei.app.modules.grant.service;
 
-import org.mei.app.modules.grant.domain.GrantAccessPermission;
+import org.mei.app.modules.grant.domain.GrantAccessPermit;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface GrantService {
 
-	List<GrantAccessPermission> getGrantAccessPermissionList();
+	List<GrantAccessPermit> getGrantAccessPermissionList();
 }
