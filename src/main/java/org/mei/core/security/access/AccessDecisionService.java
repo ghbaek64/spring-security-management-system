@@ -31,10 +31,10 @@ import java.util.List;
  */
 public class AccessDecisionService implements AccessDecisionManager {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private final AccessMatchingService accessMatchingRole;
+	private final AccessMatchingService accessMatchingService;
 
-	public AccessDecisionService(AccessMatchingService accessMatchingRole) {
-		this.accessMatchingRole = accessMatchingRole;
+	public AccessDecisionService(AccessMatchingService accessMatchingService) {
+		this.accessMatchingService = accessMatchingService;
 	}
 
 	private MessageSourceAccessor messageSourceAccessor = SpringSecurityMessageSource.getAccessor();
@@ -56,24 +56,24 @@ public class AccessDecisionService implements AccessDecisionManager {
 		consumerAuthentication = new ConsumerManager(authentication);
 		List<String> hasAuthorities = consumerAuthentication.getAuthoritiesToString();
 
-		AccessRole needRole = accessMatchingRole.needRole(path, method);
+		AccessRule needRule = accessMatchingService.needRule(path, method);
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("request path: " + path);
 			logger.debug("request method: " + method);
 			logger.debug("need configAttributes: " + configAttributes);
-			logger.debug("need AccessRole: " + needRole);
+			logger.debug("need AccessRule: " + needRule);
 			logger.debug("has Authorities: " + consumerAuthentication.getAuthorities());
 		}
 
 		boolean error = true;
 
-		if (needRole == null) {
+		if (needRule == null) {
 			error = false;
 		} else {
 
-			boolean isAllow = needRole.isAllow();
-			List<String> roleNames = needRole.getRoleName();
+			boolean isAllow = needRule.isAllow();
+			List<String> roleNames = needRule.getRoleName();
 
 			if (isAllow && roleNames.size() == 0) { // 모두 허용
 				error = false;
@@ -107,24 +107,24 @@ public class AccessDecisionService implements AccessDecisionManager {
 			return;
 		}
 */
-		AccessPermissionRole needPermissionRole = accessMatchingRole.needPermissionRole(path, method);
-		Permission needPermission = accessMatchingRole.needPermission(path, method, needPermissionRole);
+		AccessPermit needPermit = accessMatchingService.needPermit(path, method);
+		Permission needPermission = accessMatchingService.needPermission(path, method, needPermit);
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("need permission role: " + needPermissionRole);
-			logger.debug("need permission: " + needPermission);
+			logger.debug("need AccessPermit: " + needPermit);
+			logger.debug("need Permission: " + needPermission);
 		}
 
 		if (needPermission == null || needPermission == Permission.NONE) {
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("need permission none");
+				logger.debug("permission none");
 			}
 
 			return;
 		}
 
-		List<Permission> hasPermissions = accessMatchingRole.hasPermission(consumerAuthentication, needPermissionRole.getRoleName());
+		List<Permission> hasPermissions = accessMatchingService.hasPermission(consumerAuthentication, needPermit.getRoleName());
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("has permission: " + hasPermissions);

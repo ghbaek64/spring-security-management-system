@@ -14,8 +14,7 @@ import java.io.Serializable;
  * @site http://syaku.tistory.com
  * @since 16. 7. 4.
  */
-@Entity(name = "GRANT_ACCESS")
-@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class GrantAccess implements Serializable {
 
 	private static final long serialVersionUID = 8935674872273631881L;

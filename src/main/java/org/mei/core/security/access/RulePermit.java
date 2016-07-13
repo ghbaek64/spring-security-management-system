@@ -6,19 +6,19 @@ import org.mei.core.security.enums.Permission;
 import java.util.List;
 
 /**
- * AccessPermissionRole에 대한 퍼미션 정보
+ * AccessPermit 에 대한 연결된 퍼미션 정보
  *
- * @see AccessPermissionRole
+ * @see AccessPermit
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 15.
  */
-public class AccessPermission {
+public class RulePermit {
 	private final List<String> pattern;
 	private List<Method> method;
 	private final Permission permission;
 
-	public AccessPermission(List<String> pattern, List<Method> method, Permission permission) {
+	public RulePermit(List<String> pattern, List<Method> method, Permission permission) {
 		this.pattern = pattern;
 		this.method = method;
 		this.permission = permission;

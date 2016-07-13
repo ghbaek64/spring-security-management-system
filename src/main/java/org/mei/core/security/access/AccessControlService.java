@@ -1,6 +1,6 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.authorization.ConsumerPermission;
+import org.mei.core.security.authorization.ConsumerPermit;
 
 import java.util.List;
 import java.util.Map;
@@ -17,21 +17,21 @@ public interface AccessControlService {
 	 *
 	 * @return
 	 */
-	List<AccessRole> getAccessRoleList();
+	List<AccessRule> getAccessRules();
 
 	/**
 	 * 접근 퍼미션을 모두 조회한다.
 	 *
 	 * @return
 	 */
-	List<AccessPermissionRole> getAccessPermissionRoleList();
+	List<AccessPermit> getAccessPermits();
 
 	/**
 	 * 기본 퍼미션을 모두 조회한다.
 	 *
 	 * @return
 	 */
-	Map<String, BasicPermission> getBasicPermissionObject();
+	Map<String, BasicPermit> getBasicPermit();
 
 	/**
 	 * 룰의 기본 퍼미션을 조회한다.
@@ -39,14 +39,14 @@ public interface AccessControlService {
 	 * @param roleName role name
 	 * @return
 	 */
-	BasicPermission getBasicPermissionObject(String roleName);
+	BasicPermit getBasicPermit(String roleName);
 
 	/**
 	 * 모든 사용자에 부여된 권한을 조회한다.
 	 *
 	 * @return
 	 */
-	Map<String, List<ConsumerPermission>> getConsumerPermissionObject();
+	Map<String, List<ConsumerPermit>> getConsumerPermit();
 
 	/**
 	 * 사용자에 부여된 권한을 조회한다.
@@ -54,5 +54,5 @@ public interface AccessControlService {
 	 * @param username 사용자 아이디
 	 * @return
 	 */
-	List<ConsumerPermission> getConsumerPermissionObject(String username);
+	List<ConsumerPermit> getConsumerPermits(String username);
 }

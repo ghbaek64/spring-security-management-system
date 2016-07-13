@@ -3,7 +3,7 @@ package org.mei.core.security.authentication;
 import org.mei.core.security.access.AccessControlService;
 import org.mei.core.security.authorization.Authority;
 import org.mei.core.security.authorization.Consumer;
-import org.mei.core.security.authorization.ConsumerPermission;
+import org.mei.core.security.authorization.ConsumerPermit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -78,13 +78,13 @@ public class ConsumerAuthenticationProvider implements AuthenticationProvider {
 		}
 
 
-		List<ConsumerPermission> consumerPermissionList = accessControlService.getConsumerPermissionObject(username);
+		List<ConsumerPermit> consumerPermits = accessControlService.getConsumerPermits(username);
 
 		List<Authority> authorities = new ArrayList<>();
 
-		if (consumerPermissionList != null) {
-			for(ConsumerPermission consumerPermission : consumerPermissionList) {
-				authorities.add(new Authority(consumerPermission.getRoleName(), consumerPermission.getPermissions()));
+		if (consumerPermits != null) {
+			for(ConsumerPermit consumerPermit : consumerPermits) {
+				authorities.add(new Authority(consumerPermit.getRoleName(), consumerPermit.getPermissions()));
 			}
 		}
 

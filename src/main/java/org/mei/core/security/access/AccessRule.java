@@ -11,14 +11,14 @@ import java.util.List;
  * @site http://syaku.tistory.com
  * @since 16. 6. 13.
  */
-public class AccessRole {
+public class AccessRule {
 
 	private final List<String> pattern;
 	private List<Method> method;
 	private List<String> roleName;
 	private boolean allow;
 
-	public AccessRole(List<String> pattern, List<Method> method, boolean allow, List<String> roleName) {
+	public AccessRule(List<String> pattern, List<Method> method, boolean allow, List<String> roleName) {
 		this.pattern = pattern;
 		this.method = method;
 		this.allow = allow;

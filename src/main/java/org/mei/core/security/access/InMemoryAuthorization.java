@@ -1,7 +1,7 @@
 package org.mei.core.security.access;
 
 import org.mei.core.common.object.Collecting;
-import org.mei.core.security.authorization.ConsumerPermission;
+import org.mei.core.security.authorization.ConsumerPermit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,79 +9,80 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 접근 권한 정보
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 22.
  */
 public class InMemoryAuthorization implements AccessControlService {
-	private static final Map<String, BasicPermission> basicPermission;
-	private static final List<AccessRole> accessRole;
-	private static final List<AccessPermissionRole> accessPermissionRole;
-	private static final Map<String, List<ConsumerPermission>> consumerPermission;
+	private static final Map<String, BasicPermit> basicPermit;
+	private static final List<AccessRule> accessRules;
+	private static final List<AccessPermit> accessPermits;
+	private static final Map<String, List<ConsumerPermit>> consumerPermit;
 
 	static {
-		basicPermission = new HashMap<>();
-		accessRole = new ArrayList<>();
-		accessPermissionRole = new ArrayList<>();
-		consumerPermission = new HashMap<>();
+		basicPermit = new HashMap<>();
+		accessRules = new ArrayList<>();
+		accessPermits = new ArrayList<>();
+		consumerPermit = new HashMap<>();
 	}
 
-	public InMemoryAuthorization add(BasicPermission permission) {
-		basicPermission.put(permission.getRoleName(), permission);
+	public InMemoryAuthorization add(BasicPermit permit) {
+		basicPermit.put(permit.getRoleName(), permit);
 		return this;
 	}
 
-	public InMemoryAuthorization add(AccessRole role) {
-		accessRole.add(role);
+	public InMemoryAuthorization add(AccessRule rules) {
+		accessRules.add(rules);
 		return this;
 	}
 
-	public InMemoryAuthorization add(AccessPermissionRole role) {
-		accessPermissionRole.add(role);
+	public InMemoryAuthorization add(AccessPermit permits) {
+		accessPermits.add(permits);
 		return this;
 	}
 
-	public InMemoryAuthorization add(ConsumerPermission consumer) {
-		String username = consumer.getUsername();
+	public InMemoryAuthorization add(ConsumerPermit permits) {
+		String username = permits.getUsername();
 
-		if (consumerPermission.containsKey(username)) {
-			consumerPermission.get(username).add(consumer);
+		if (consumerPermit.containsKey(username)) {
+			consumerPermit.get(username).add(permits);
 		} else {
-			consumerPermission.put(username, Collecting.createList(consumer));
+			consumerPermit.put(username, Collecting.createList(permits));
 		}
 
 		return this;
 	}
 
 	@Override
-	public List<AccessRole> getAccessRoleList() {
-		return accessRole;
+	public List<AccessRule> getAccessRules() {
+		return accessRules;
 	}
 
 	@Override
-	public List<AccessPermissionRole> getAccessPermissionRoleList() {
-		return accessPermissionRole;
+	public List<AccessPermit> getAccessPermits() {
+		return accessPermits;
 	}
 
 	@Override
-	public Map<String, BasicPermission> getBasicPermissionObject() {
-		return basicPermission;
+	public Map<String, BasicPermit> getBasicPermit() {
+		return basicPermit;
 	}
 
 	@Override
-	public BasicPermission getBasicPermissionObject(String roleName) {
-		if (basicPermission == null) return null;
-		return basicPermission.get(roleName);
+	public BasicPermit getBasicPermit(String roleName) {
+		if (basicPermit == null) return null;
+		return basicPermit.get(roleName);
 	}
 
 	@Override
-	public Map<String, List<ConsumerPermission>> getConsumerPermissionObject() {
-		return consumerPermission;
+	public Map<String, List<ConsumerPermit>> getConsumerPermit() {
+		return consumerPermit;
 	}
 
 	@Override
-	public List<ConsumerPermission> getConsumerPermissionObject(String username) {
-		if (consumerPermission == null) return null;
-		return consumerPermission.get(username);
+	public List<ConsumerPermit> getConsumerPermits(String username) {
+		if (consumerPermit == null) return null;
+		return consumerPermit.get(username);
 	}
 }

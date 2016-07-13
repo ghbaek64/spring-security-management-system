@@ -5,7 +5,7 @@ import org.mei.core.security.access.*;
 import org.mei.core.security.authentication.ConsumerAuthenticationProvider;
 import org.mei.core.security.authentication.ConsumerDetailsService;
 import org.mei.core.security.authentication.UserDetailsServiceImpl;
-import org.mei.core.security.authorization.ConsumerPermission;
+import org.mei.core.security.authorization.ConsumerPermit;
 import org.mei.core.security.enums.Permission;
 import org.mei.core.security.filter.SecurityMetadataSource;
 import org.mei.core.security.handler.*;
@@ -112,21 +112,21 @@ public class SecurityContext {
 
 		// 기본 권한 설정
 		inMemoryAuthorization
-				.add(new ConsumerPermission("admin", "ROLE_PERM_0001", Collecting.createList(Permission.ADMIN)))
-				.add(new ConsumerPermission("test", "ROLE_PERM_0001", Collecting.createList(Permission.LIST, Permission.WRITE)))
+				.add(new ConsumerPermit("admin", "ROLE_PERM_0001", Collecting.createList(Permission.ADMIN)))
+				.add(new ConsumerPermit("test", "ROLE_PERM_0001", Collecting.createList(Permission.LIST, Permission.WRITE)))
 
-				.add(new BasicPermission("ROLE_ADMIN", Collecting.createList(Permission.ADMIN)))
+				.add(new BasicPermit("ROLE_ADMIN", Collecting.createList(Permission.ADMIN)))
 
-				.add(new AccessRole(Collecting.createList("/member/login"), null, true, null))
-				.add(new AccessRole(Collecting.createList("/member/mypage"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
-				.add(new AccessRole(Collecting.createList("/member/visitor"), null, true, Collecting.createList("ROLE_ADMIN")))
-				.add(new AccessRole(Collecting.createList("/**"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
+				.add(new AccessRule(Collecting.createList("/member/login"), null, true, null))
+				.add(new AccessRule(Collecting.createList("/member/mypage"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
+				.add(new AccessRule(Collecting.createList("/member/visitor"), null, true, Collecting.createList("ROLE_ADMIN")))
+				.add(new AccessRule(Collecting.createList("/**"), null, true, Collecting.createList("ROLE_USER", "ROLE_ADMIN")))
 
-				.add(new AccessPermissionRole("ROLE_PERM_0001", Collecting.createList("/board/**"), null, Collecting.createList(
-						new AccessPermission(Collecting.createList("/board"), null, Permission.LIST),
-						new AccessPermission(Collecting.createList("/board/view"), null, Permission.VIEW),
-						new AccessPermission(Collecting.createList("/board/write"), null, Permission.WRITE),
-						new AccessPermission(Collecting.createList("/board/delete"), null, Permission.MANAGER))));
+				.add(new AccessPermit("ROLE_PERM_0001", Collecting.createList("/board/**"), null, Collecting.createList(
+						new RulePermit(Collecting.createList("/board"), null, Permission.LIST),
+						new RulePermit(Collecting.createList("/board/view"), null, Permission.VIEW),
+						new RulePermit(Collecting.createList("/board/write"), null, Permission.WRITE),
+						new RulePermit(Collecting.createList("/board/delete"), null, Permission.MANAGER))));
 
 
 		passwordEncoder = getPasswordEncoder();

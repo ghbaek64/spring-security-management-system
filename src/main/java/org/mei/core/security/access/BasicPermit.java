@@ -5,16 +5,16 @@ import org.mei.core.security.enums.Permission;
 import java.util.List;
 
 /**
- * 룰에 대한 기본 퍼미션 설정
+ * 접근에 대한 기본 퍼미션 설정
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 22.
  */
-public class BasicPermission {
+public class BasicPermit {
 	private final String roleName;
 	private final List<Permission> permission;
 
-	public BasicPermission(String roleName, List<Permission> permission) {
+	public BasicPermit(String roleName, List<Permission> permission) {
 		this.roleName = roleName;
 		this.permission = permission;
 	}

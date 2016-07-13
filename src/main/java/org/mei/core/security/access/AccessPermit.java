@@ -10,13 +10,13 @@ import java.util.List;
  * @site http://syaku.tistory.com
  * @since 16. 6. 21.
  */
-public class AccessPermissionRole {
+public class AccessPermit {
 	private final String roleName;
 	private final List<String> pattern;
 	private List<Method> method;
-	private List<AccessPermission> accessPermission;
+	private List<RulePermit> accessPermission;
 
-	public AccessPermissionRole(String roleName, List<String> pattern, List<Method> method, List<AccessPermission> accessPermission) {
+	public AccessPermit(String roleName, List<String> pattern, List<Method> method, List<RulePermit> accessPermission) {
 		this.roleName = roleName;
 		this.pattern = pattern;
 		this.method = method;
@@ -35,7 +35,7 @@ public class AccessPermissionRole {
 		return method;
 	}
 
-	public List<AccessPermission> getAccessPermission() {
+	public List<RulePermit> getAccessPermission() {
 		return accessPermission;
 	}
 

@@ -1,7 +1,7 @@
 package org.mei.core.security.access;
 
-import org.mei.core.security.authorization.ConsumerManager;
 import org.mei.core.security.authorization.Authority;
+import org.mei.core.security.authorization.ConsumerManager;
 import org.mei.core.security.enums.Method;
 import org.mei.core.security.enums.Permission;
 import org.mei.core.util.AntPathMatchers;
@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Request에 대한 일치하는 권한(Role, Permission)을 조회한다.
@@ -43,12 +46,12 @@ public class AccessMatchingService {
 	public Collection<ConfigAttribute> needConfigAttributes(String url, Method method) {
 		Collection<ConfigAttribute> attributes = new ArrayList<>();
 
-		AccessRole accessRole = this.needRole(url, method);
-		AccessPermissionRole accessPermissionRole = this.needPermissionRole(url, method);
+		AccessRule accessRule = this.needRule(url, method);
+		AccessPermit accessPermit = this.needPermit(url, method);
 
 		List<String> roleNames = new ArrayList<>();
-		if (accessRole != null) roleNames.addAll(accessRole.getRoleName());
-		if (accessPermissionRole != null) roleNames.add(accessPermissionRole.getRoleName());
+		if (accessRule != null) roleNames.addAll(accessRule.getRoleName());
+		if (accessPermit != null) roleNames.add(accessPermit.getRoleName());
 
 		for(String roleName : roleNames) {
 			attributes.add(new SecurityConfig(roleName));
@@ -57,12 +60,12 @@ public class AccessMatchingService {
 		return attributes;
 	}
 
-	public AccessRole needRole(String url, Method method) {
-		List<AccessRole> accessRoleList = accessControlService.getAccessRoleList();
+	public AccessRule needRule(String url, Method method) {
+		List<AccessRule> accessRules = accessControlService.getAccessRules();
 
-		if (accessRoleList == null) return null;
+		if (accessRules == null) return null;
 
-		for(AccessRole accessRole : accessRoleList) {
+		for(AccessRule accessRole : accessRules) {
 			List<Method> methods = accessRole.getMethod();
 
 			if (methods != null) {
@@ -78,21 +81,21 @@ public class AccessMatchingService {
 		return null;
 	}
 
-	public AccessPermissionRole needPermissionRole(String url, Method method) {
-		List<AccessPermissionRole> accessPermissionRoleList = accessControlService.getAccessPermissionRoleList();
+	public AccessPermit needPermit(String url, Method method) {
+		List<AccessPermit> accessPermits = accessControlService.getAccessPermits();
 
-		if (accessPermissionRoleList == null) return null;
+		if (accessPermits == null) return null;
 
-		for(AccessPermissionRole accessPermissionRole : accessPermissionRoleList) {
-			List<Method> methods = accessPermissionRole.getMethod();
+		for(AccessPermit accessPermit : accessPermits) {
+			List<Method> methods = accessPermit.getMethod();
 
 			if (methods != null) {
 				if (methods.indexOf(method) == -1) continue;
 			}
 
-			List<String> patterns = accessPermissionRole.getPattern();
+			List<String> patterns = accessPermit.getPattern();
 			if (antPathMatchers.matches(patterns, url)) {
-				return accessPermissionRole;
+				return accessPermit;
 			}
 		}
 
@@ -103,24 +106,24 @@ public class AccessMatchingService {
 		return needPermission(url, method, null);
 	}
 
-	public Permission needPermission(String url, Method method, AccessPermissionRole accessPermissionRole) {
-		if (accessPermissionRole == null) accessPermissionRole = needPermissionRole(url, method);
+	public Permission needPermission(String url, Method method, AccessPermit accessPermit) {
+		if (accessPermit == null) accessPermit = needPermit(url, method);
 
-		if (accessPermissionRole == null) return null;
+		if (accessPermit == null) return null;
 
-		List<AccessPermission> accessPermissionList = accessPermissionRole.getAccessPermission();
-		if (accessPermissionList == null) return null;
+		List<RulePermit> rulePermits = accessPermit.getAccessPermission();
+		if (rulePermits == null) return null;
 
-		for(AccessPermission accessPermission : accessPermissionList) {
-			List<Method> methods = accessPermission.getMethod();
+		for(RulePermit rulePermit : rulePermits) {
+			List<Method> methods = rulePermit.getMethod();
 
 			if (methods != null) {
 				if (methods.indexOf(method) == -1) continue;
 			}
 
-			List<String> patterns = accessPermission.getPattern();
+			List<String> patterns = rulePermit.getPattern();
 			if (antPathMatchers.matches(patterns, url)) {
-				return accessPermission.getPermission();
+				return rulePermit.getPermission();
 			}
 		}
 
@@ -133,16 +136,16 @@ public class AccessMatchingService {
 	 * @param roleName
 	 * @return 기본 퍼미션
 	 */
-	public List<Permission> basicPermission(String roleName) {
+	public List<Permission> basicPermits(String roleName) {
 
 		if (roleName == null) return null;
 
-		Map<String, BasicPermission> basicPermissionMap = accessControlService.getBasicPermissionObject();
-		BasicPermission basicPermission = basicPermissionMap.get(roleName);
+		Map<String, BasicPermit> basicPermitMap = accessControlService.getBasicPermit();
+		BasicPermit basicPermit = basicPermitMap.get(roleName);
 
-		if (basicPermission == null) return null;
+		if (basicPermit == null) return null;
 
-		return basicPermission.getPermission();
+		return basicPermit.getPermission();
 	}
 
 	/**
@@ -161,20 +164,20 @@ public class AccessMatchingService {
 	 * @return 사용자가 가진 퍼미션
 	 */
 	public List<Permission> hasPermission(ConsumerManager consumerAuthentication, String roleName) {
-		List<Permission> hasPrivilege = basicPermission(consumerAuthentication.getGroupRole());
+		List<Permission> hasPrivilege = this.basicPermits(consumerAuthentication.getGroupRole());
 
 		if (hasPrivilege == null) hasPrivilege = new ArrayList<>();
 
 		if (hasPrivilege.indexOf(Permission.ADMIN) > -1 || hasPrivilege.indexOf(Permission.MANAGER) > -1 || roleName == null) return hasPrivilege;
 
-		List<Permission> basicPermission = basicPermission(roleName);
+		List<Permission> basicPermits = this.basicPermits(roleName);
 
-		if (basicPermission != null) {
-			if (basicPermission.indexOf(Permission.NONE) > -1) {
+		if (basicPermits != null) {
+			if (basicPermits.indexOf(Permission.NONE) > -1) {
 				hasPrivilege.clear();
 			} else {
-				if (basicPermission.indexOf(Permission.ADMIN) > -1 || basicPermission.indexOf(Permission.MANAGER) > -1) return basicPermission;
-				for(Permission permission : basicPermission) {
+				if (basicPermits.indexOf(Permission.ADMIN) > -1 || basicPermits.indexOf(Permission.MANAGER) > -1) return basicPermits;
+				for(Permission permission : basicPermits) {
 					if (hasPrivilege.indexOf(permission) == -1) hasPrivilege.add(permission);
 				}
 			}
