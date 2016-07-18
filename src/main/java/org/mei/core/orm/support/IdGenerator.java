@@ -1,4 +1,4 @@
-package org.mei.core.orm;
+package org.mei.core.orm.support;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;

@@ -1,8 +1,11 @@
 package org.mei.app.modules.grant.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
@@ -10,7 +13,9 @@ import java.io.Serializable;
  * @site http://syaku.tistory.com
  * @since 16. 7. 13.
  */
-@Entity(name = "GRANT_BASIC_PERMIT")
+@Entity
+@Table(name = "GRANT_BASIC_PERMIT")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GrantBasicPermit implements Serializable {
 
 	private static final long serialVersionUID = -8645675549624832171L;
@@ -33,5 +38,13 @@ public class GrantBasicPermit implements Serializable {
 
 	public void setPermissions(String permissions) {
 		this.permissions = permissions;
+	}
+
+	@Override
+	public String toString() {
+		return "GrantBasicPermit{" +
+				"roleName='" + roleName + '\'' +
+				", permissions='" + permissions + '\'' +
+				'}';
 	}
 }

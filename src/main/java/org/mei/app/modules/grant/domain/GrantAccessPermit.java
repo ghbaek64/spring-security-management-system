@@ -5,25 +5,29 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
  * @author Seok Kyun. Choi. 최석균 (Syaku)
  * @site http://syaku.tistory.com
  * @since 16. 6. 10.
+ *
+ * @see org.mei.core.security.access.AccessPermit
  */
-@Entity(name = "GRANT_ACCESS_PERMIT")
+@Entity
+@Table(name = "GRANT_ACCESS_PERMIT")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GrantAccessPermit implements Serializable {
 
 	private static final long serialVersionUID = -6906991921562410284L;
 
-	@Column(name = "role_names")
+	@Column(name = "role_name")
 	@Id
 	private String roleName;
 	private String patterns;
 	private String methods;
-	private int seq;
+	private Integer seq;
 
 	public String getRoleName() {
 		return roleName;
@@ -49,11 +53,11 @@ public class GrantAccessPermit implements Serializable {
 		this.methods = methods;
 	}
 
-	public int getSeq() {
+	public Integer getSeq() {
 		return seq;
 	}
 
-	public void setSeq(int seq) {
+	public void setSeq(Integer seq) {
 		this.seq = seq;
 	}
 

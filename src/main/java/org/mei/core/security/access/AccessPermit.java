@@ -11,6 +11,8 @@ import java.util.List;
  * @since 16. 6. 21.
  */
 public class AccessPermit {
+	public static final String rolePrefix = "ROLE_PERM_";
+
 	private final String roleName;
 	private final List<String> pattern;
 	private List<Method> method;

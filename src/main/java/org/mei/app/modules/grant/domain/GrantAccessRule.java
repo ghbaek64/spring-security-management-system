@@ -1,6 +1,8 @@
 package org.mei.app.modules.grant.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.GenericGenerator;
+import org.mei.core.orm.support.BooleanToStringConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,7 +12,8 @@ import java.io.Serializable;
  * @site http://syaku.tistory.com
  * @since 16. 7. 4.
  */
-@Entity(name = "GRANT_ACCESS_RULE")
+@Entity
+@Table(name = "GRANT_ACCESS_RULE")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GrantAccessRule implements Serializable {
 
@@ -18,20 +21,29 @@ public class GrantAccessRule implements Serializable {
 
 	@Column(name = "access_rule_srl")
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long accessRuleSrl;
+	@GeneratedValue(generator = "IdGenerator")
+	@GenericGenerator(
+			name = "IdGenerator",
+			strategy = "org.mei.core.orm.IdGenerator",
+			parameters = {
+					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "GRANT_ACCESS_RULE_SEQ")
+			})
+	private Long accessRuleSrl;
 	private String patterns;
 	private String methods;
+
 	@Column(name = "role_names")
 	private String roleNames;
-	private String allow;
-	private int seq;
 
-	public long getAccessRuleSrl() {
+	@Convert(converter = BooleanToStringConverter.class)
+	private Boolean allow;
+	private Integer seq;
+
+	public Long getAccessRuleSrl() {
 		return accessRuleSrl;
 	}
 
-	public void setAccessRuleSrl(long accessRuleSrl) {
+	public void setAccessRuleSrl(Long accessRuleSrl) {
 		this.accessRuleSrl = accessRuleSrl;
 	}
 
@@ -59,19 +71,19 @@ public class GrantAccessRule implements Serializable {
 		this.roleNames = roleNames;
 	}
 
-	public String getAllow() {
+	public Boolean getAllow() {
 		return allow;
 	}
 
-	public void setAllow(String allow) {
+	public void setAllow(Boolean allow) {
 		this.allow = allow;
 	}
 
-	public int getSeq() {
+	public Integer getSeq() {
 		return seq;
 	}
 
-	public void setSeq(int seq) {
+	public void setSeq(Integer seq) {
 		this.seq = seq;
 	}
 

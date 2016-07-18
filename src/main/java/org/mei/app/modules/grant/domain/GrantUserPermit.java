@@ -2,9 +2,7 @@ package org.mei.app.modules.grant.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -12,7 +10,9 @@ import java.io.Serializable;
  * @site http://syaku.tistory.com
  * @since 16. 7. 13.
  */
-@Entity(name = "GRANT_USER_PERMIT")
+@Entity
+@Table(name = "GRANT_USER_PERMIT")
+@IdClass(GrantUserPermitPK.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GrantUserPermit implements Serializable {
 
@@ -21,6 +21,7 @@ public class GrantUserPermit implements Serializable {
 	@Column(name = "user_id")
 	@Id
 	private String userId;
+
 	@Column(name = "role_name")
 	@Id
 	private String roleName;

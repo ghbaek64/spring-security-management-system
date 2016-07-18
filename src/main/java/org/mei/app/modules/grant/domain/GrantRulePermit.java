@@ -1,7 +1,10 @@
 package org.mei.app.modules.grant.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.GeneratorType;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -9,26 +12,32 @@ import java.io.Serializable;
  * @site http://syaku.tistory.com
  * @since 16. 7. 13.
  */
+@Entity
+@Table(name = "GRANT_RULE_PERMIT")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GrantRulePermit implements Serializable {
 
 	private static final long serialVersionUID = -954312860713037351L;
 
 	@Column(name = "rule_permit_srl")
 	@Id
-	private long rulePermitSrl;
+	@GeneratedValue(generator = "IdGenerator")
+	@GenericGenerator(name = "IdGenerator",
+			strategy = "org.mei.core.orm.IdGenerator",
+			parameters = {
+					@org.hibernate.annotations.Parameter(name = "sequenceName", value = "GRANT_RULE_PERMIT_SEQ")
+			})
+	private Long rulePermitSrl;
+
 	@Column(name = "role_name")
 	private String roleName;
 	private String patterns;
 	private String methods;
 	private String permission;
-	private int seq;
+	private Integer seq;
 
-	public long getRulePermitSrl() {
+	public Long getRulePermitSrl() {
 		return rulePermitSrl;
-	}
-
-	public void setRulePermitSrl(long rulePermitSrl) {
-		this.rulePermitSrl = rulePermitSrl;
 	}
 
 	public String getRoleName() {
@@ -63,11 +72,11 @@ public class GrantRulePermit implements Serializable {
 		this.permission = permission;
 	}
 
-	public int getSeq() {
+	public Integer getSeq() {
 		return seq;
 	}
 
-	public void setSeq(int seq) {
+	public void setSeq(Integer seq) {
 		this.seq = seq;
 	}
 
