@@ -5,11 +5,11 @@ import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import java.util.Properties;
 
@@ -31,9 +31,22 @@ public class ApplicationServlet extends WebMvcConfigurerAdapter {
 	@Autowired private Properties mei;
 
 	@Bean
+	public FreeMarkerViewResolver freeMarkerViewResolver() {
+		FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
+		resolver.setContentType("text/html;charset=" + mei.getProperty("app.charset"));
+		resolver.setCache(false);
+		resolver.setCacheLimit(0);
+		resolver.setPrefix("");
+		resolver.setSuffix("");
+		resolver.setExposeSpringMacroHelpers(true);
+
+		return resolver;
+	}
+
+	@Bean
 	public InternalResourceViewResolver getInternalResourceViewResolver() {
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-		resolver.setPrefix("/WEB-INF/views/");
+		resolver.setPrefix("/WEB-INF/views");
 		resolver.setContentType("text/html;charset=" + mei.getProperty("app.charset"));
 		resolver.setSuffix(".jsp");
 		resolver.setCache(false);

@@ -1,6 +1,7 @@
 package org.mei.app.modules.member.web;
 
 import org.mei.app.modules.member.service.MemberService;
+import org.mei.core.module.handler.ModuleAndView;
 import org.mei.core.module.handler.SuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -35,24 +36,24 @@ public class MemberController {
 	public ModelAndView dispMemberLogin(
 			@RequestParam(name = "redirect_url", required = false) String redirectUrl,
 			@RequestParam(name = "chain", required = false) String chain) {
-		ModelAndView mav = new ModelAndView("/app/modules/member/login");
+		ModuleAndView mav = new ModuleAndView("/member/login.ftl");
 		mav.addObject("redirectUrl", redirectUrl);
 		mav.addObject("chain", chain);
-		return mav;
+		return mav.ok();
 	}
 
 	@RequestMapping(value = "/mypage", method = RequestMethod.GET)
 	public ModelAndView dispMemberMypage(Authentication authentication) {
-		ModelAndView mav = new ModelAndView("/app/modules/member/mypage");
+		ModuleAndView mav = new ModuleAndView("/member/mypage.ftl");
 
 		mav.addObject("member", memberService.getMemberObject(authentication.getName()));
 
-		return mav;
+		return mav.ok();
 	}
 
 	@RequestMapping(value = "/visitor", method = RequestMethod.GET)
 	public ModelAndView dispMemberVisitor() {
-		ModelAndView mav = new ModelAndView("/app/modules/member/visitor");
+		ModuleAndView mav = new ModuleAndView("/member/visitor.ftl");
 
 		List<SessionInformation> activeSessions = new ArrayList<>();
 		for(Object principal : sessionRegistry.getAllPrincipals()) {
@@ -84,7 +85,7 @@ public class MemberController {
 
 		mav.addObject("visitors", visitors);
 
-		return mav;
+		return mav.ok();
 	}
 
 	@RequestMapping(value = "/visitor", method = RequestMethod.DELETE)

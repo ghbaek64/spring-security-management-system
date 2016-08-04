@@ -1,5 +1,6 @@
 package org.mei.app.modules.main.web;
 
+import org.mei.core.module.handler.ModuleAndView;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +16,7 @@ public class MainController {
 
 	@RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
 	public ModelAndView dispMainView() {
-		ModelAndView mav = new ModelAndView("/app/modules/main/main");
-		return mav;
+		ModuleAndView mav = new ModuleAndView("/main/main.view.ftl");
+		return mav.ok();
 	}
 }

@@ -58,7 +58,8 @@ configure(allprojects) {
 
 		compile "org.aspectj:aspectjweaver:${aspectjVersion}"
 
-		compile "org.springframework:spring-webmvc:${springVersion}"
+		compile "org.springframework:spring-webmvc:${springVersion}",
+				"org.springframework:spring-context-support:${springVersion}"
 
 		compile "org.springframework.security:spring-security-web:${springSecurityVersion}",
 				"org.springframework.security:spring-security-config:${springSecurityVersion}",
@@ -73,6 +74,8 @@ configure(allprojects) {
 				"org.springframework:spring-orm:${springVersion}",
 				"org.springframework:spring-tx:${springVersion}",
 				"commons-dbcp:commons-dbcp:1.4"
+
+		compile 'org.freemarker:freemarker:2.3.23'
 
 		provided "javax.servlet:javax.servlet-api:3.0.1",
 				"javax.servlet.jsp:jsp-api:2.1",
